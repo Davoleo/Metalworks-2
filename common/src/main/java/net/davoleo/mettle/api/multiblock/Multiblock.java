@@ -8,8 +8,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,12 +31,13 @@ public class Multiblock {
 
     public boolean checkStructure(Level level, BlockPos pos)
     {
-        for (StructureTemplate.StructureBlockInfo block : template.palettes.get(0).blocks())
-        {
-            if(!block.state.is(level.getBlockState(pos).getBlock()))
-                return false;
-        }
-        return true;
+        throw new NotImplementedException();
+//        for (StructureTemplate.StructureBlockInfo block : .get(0).blocks())
+//        {
+//            if(!block.state.is(level.getBlockState(pos).getBlock()))
+//                return false;
+//        }
+//        return true;
     }
 
     /*
@@ -72,7 +74,7 @@ public class Multiblock {
 
     private static Map<ResourceLocation, Multiblock> map = new HashMap<>();
 
-    public Multiblock getMultiblock(@Nonnull ServerLevel server, ResourceLocation resourceLocation)
+    public Multiblock getMultiblock(@NotNull ServerLevel server, ResourceLocation resourceLocation)
     {
         Multiblock multiblock = map.get(resourceLocation);
         if(multiblock == null)

@@ -2,8 +2,7 @@ package net.davoleo.mettle.api.metal;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * If methods' implementation return null,

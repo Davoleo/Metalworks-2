@@ -1,8 +1,7 @@
 package net.davoleo.mettle.api.metal;
 
 import org.apache.commons.lang3.tuple.Pair;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class MixtureRatio {
 

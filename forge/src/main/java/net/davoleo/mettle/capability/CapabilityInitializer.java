@@ -1,6 +1,6 @@
 package net.davoleo.mettle.capability;
 
-import net.davoleo.mettle.Mettle;
+import net.davoleo.mettle.MettleForge;
 import net.davoleo.mettle.api.capability.IMetalMixture;
 import net.davoleo.mettle.item.MetalWorkpiece;
 import net.minecraft.core.Direction;
@@ -51,7 +51,7 @@ public class CapabilityInitializer {
                     }
                 };
 
-            event.addCapability(new ResourceLocation(Mettle.MODID, "metal_mixture"), provider);
+            event.addCapability(new ResourceLocation(MettleForge.MODID, "metal_mixture"), provider);
         }
     }
 

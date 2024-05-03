@@ -1,15 +1,9 @@
-package net.davoleo.mettle.register;
+package net.davoleo.mettle.init;
 
-import com.tterrag.registrate.util.entry.ItemEntry;
-import com.tterrag.registrate.util.entry.RegistryEntry;
-import net.davoleo.mettle.item.MetalWorkpiece;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
 import java.util.HashMap;
-import java.util.Map;
-
-import static net.davoleo.mettle.Mettle.REGISTRATE;
 
 public class MettleItems {
 

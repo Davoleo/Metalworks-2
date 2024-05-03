@@ -1,12 +1,8 @@
 package net.davoleo.mettle;
 
-import com.mojang.logging.LogUtils;
-import com.tterrag.registrate.Registrate;
-import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import net.davoleo.mettle.capability.CapabilityInitializer;
-import net.davoleo.mettle.register.CoreMetals;
-import net.davoleo.mettle.register.MettleBlocks;
-import net.davoleo.mettle.register.MettleItems;
+import net.davoleo.mettle.init.MettleRegistry;
+import net.davoleo.mettle.init.ModRegistry;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -21,25 +17,17 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Mettle.MODID)
-public class Mettle {
+public class MettleForge {
 
-    public static final String MODID = "mettle";
-    public static final String MODNAME = MODID;
-    public static final String MODVERSION = ModList.get().getModFileById(MODID).versionString();
+    public static final String MODVERSION = ModList.get().getModFileById(Mettle.MODID).versionString();
 
-    // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    public static final NonNullSupplier<Registrate> REGISTRATE = NonNullSupplier.lazy(() -> Registrate.create(MODID));
-
-    public static final CreativeModeTab CREATIVE_TAB = new CreativeModeTab(MODID) {
+    public static final CreativeModeTab CREATIVE_TAB = new CreativeModeTab(Mettle.MODID) {
         @Nonnull
         @Override
         public ItemStack makeIcon()
@@ -48,7 +36,7 @@ public class Mettle {
         }
     };
 
-    public Mettle()
+    public MettleForge()
     {
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -62,25 +50,22 @@ public class Mettle {
         MinecraftForge.EVENT_BUS.register(CapabilityInitializer.class);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(CapabilityInitializer::registerCapabilities);
 
-        REGISTRATE.get().creativeModeTab(() -> CREATIVE_TAB);
-
-        CoreMetals.init();
-        MettleBlocks.init();
-        MettleItems.init();
+        MettleRegistry.setup();
+        ModRegistry.init();
     }
 
     private void setup(final FMLCommonSetupEvent event)
     {
         // Some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        Mettle.LOGGER.info("HELLO FROM PREINIT");
+        Mettle.LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event)
     {
         // Some example code to dispatch IMC to another mod
         InterModComms.sendTo("mettle", "helloworld", () -> {
-            LOGGER.info("Hello world from the MDK");
+            Mettle.LOGGER.info("Hello world from the MDK");
             return "Hello world";
         });
     }
@@ -88,7 +73,7 @@ public class Mettle {
     private void processIMC(final InterModProcessEvent event)
     {
         // Some example code to receive and process InterModComms from other mods
-        LOGGER.info("Got IMC {}", event.getIMCStream().
+        Mettle.LOGGER.info("Got IMC {}", event.getIMCStream().
                 map(m -> m.messageSupplier().get()).
                 collect(Collectors.toList()));
     }
@@ -98,7 +83,7 @@ public class Mettle {
     public void onServerStarting(ServerStartingEvent event)
     {
         // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
+        Mettle.LOGGER.info("HELLO from server starting");
 
 
     }

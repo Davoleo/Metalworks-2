@@ -1,6 +1,6 @@
 package net.davoleo.mettle.item;
 
-import net.davoleo.mettle.Mettle;
+import net.davoleo.mettle.MettleForge;
 import net.davoleo.mettle.capability.MetalMixture;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -15,7 +15,7 @@ public class MetalWorkpiece extends Item {
 
     public MetalWorkpiece()
     {
-        super(new Properties().tab(Mettle.CREATIVE_TAB));
+        super(new Properties().tab(MettleForge.CREATIVE_TAB));
         //setRegistryName("mettle:metal_workpiece");
     }
 

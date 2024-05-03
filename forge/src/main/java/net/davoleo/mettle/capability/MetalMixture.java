@@ -10,9 +10,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.registries.RegistryObject;
 
-public class MetalMixture implements IMetalMixture {
+public class MetalMixture implements IMetalMixture, INBTSerializable<CompoundTag> {
 
     public static final Capability<IMetalMixture> MIXTURE = CapabilityManager.get(new CapabilityToken<>() {
         @Override

@@ -1,8 +1,8 @@
 package net.davoleo.mettle.api.metal;
 
-import net.minecraftforge.registries.IForgeRegistryEntry;
+public interface IMetal {
 
-public interface IMetal extends IForgeRegistryEntry<IMetal> {
+    String getName();
 
     int getColor();
 

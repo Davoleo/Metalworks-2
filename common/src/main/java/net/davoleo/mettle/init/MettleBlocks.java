@@ -1,14 +1,10 @@
-package net.davoleo.mettle.register;
+package net.davoleo.mettle.init;
 
-import com.google.common.collect.Lists;
-import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
-import com.tterrag.registrate.util.entry.BlockEntry;
 import net.davoleo.mettle.Mettle;
 import net.davoleo.mettle.block.MettleOreBlock;
-import net.davoleo.mettle.util.DataGenConstants;
+import net.davoleo.mettle.registry.RegistryEntry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -17,30 +13,18 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.LinkedList;
-
-import static net.davoleo.mettle.Mettle.REGISTRATE;
-
-public class MettleBlocks {
-
-    public static final DeferredRegister<Block> REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, Mettle.MODID);
-    public static LinkedList<BlockEntry<? extends Block>> blocks = Lists.newLinkedList();
+public class MettleBlocks extends ModRegistry {
 
     public static void init() {
-        MettleBlocks.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
         Ores.init();
     }
 
     public static final class Ores {
 
-        public static final com.tterrag.registrate.util.entry.BlockEntry<MettleOreBlock> TIN_ORE
+        public static final RegistryEntry<MettleOreBlock> TIN_ORE
                  = REGISTRATE.get().object("tin_ore")
-                .block(p -> new MettleOreBlock(BlockBehaviour.Properties.of(Material.STONE), CoreMetals.TIN))
-                .loot(Ores::lootTable)
+                .block(p -> new MettleOreBlock(CoreMetals.TIN))
                 .simpleItem()
                 .register();
 
