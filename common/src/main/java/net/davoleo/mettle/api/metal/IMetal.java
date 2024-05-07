@@ -2,12 +2,21 @@ package net.davoleo.mettle.api.metal;
 
 public interface IMetal {
 
-    String getName();
+    /**
+     * @return The name, unique identifier of a metal
+     */
+    String name();
 
-    int getColor();
+    int color();
 
-    MetalProperties getProperties();
+    int durability();
 
-    MetalComponents getComponents();
+    int enchantability();
+
+    ToolStats toolStats();
+
+    ArmorStats armorStats();
+
+    MetalComponents components();
 
 }

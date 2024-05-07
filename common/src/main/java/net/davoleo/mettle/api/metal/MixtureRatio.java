@@ -3,6 +3,7 @@ package net.davoleo.mettle.api.metal;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class MixtureRatio {
 
     private final Pair<String, Integer> metal1;
