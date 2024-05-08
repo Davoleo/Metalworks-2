@@ -1,81 +1,79 @@
 package net.davoleo.mettle.api.metal;
 
-import com.google.common.collect.Range;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 
 public class Alloy {
 
-    private final String name;
-
-    private final MixtureRatio standardRatio;
-
-    private final Map<String, Range<Integer>> validRanges;
-
-    private Alloy(String name, MixtureRatio standardRatio)
-    {
-        this.name = name;
-        this.standardRatio = standardRatio;
-        this.validRanges = new HashMap<>(4, 1);
+    public record Ingredient(IMetal metal, int ratio) {
     }
 
-    public String getName() {
-        return name;
-    }
+    private final Ingredient[] metals;
+    private final IMetal alloy;
 
-    public MixtureRatio getStandardRatio() {
-        return standardRatio;
-    }
+    public Alloy(IMetal alloy, Ingredient... ingredients) {
+        this.alloy = alloy;
 
-    public Set<String> getIngredientMetalNames() {
-        return validRanges.keySet();
-    }
-
-    public boolean doesMixtureConform(MixtureRatio mixture) {
-        for (String metal : mixture.getMetals())
-        {
-            if (!validRanges.containsKey(metal))
-                return false;
-
-            Range<Integer> validRange = validRanges.get(metal);
-            return validRange.contains(mixture.getRatio(metal));
+        if (ingredients.length < 2 || ingredients.length > 3) {
+            throw new IllegalArgumentException("Alloys only support 2 or 3 ingredients");
         }
-        return false;
+
+        this.metals = ingredients;
+    }
+
+    public static Builder create(IMetal output) {
+        return new Builder(output);
+    }
+
+    @Nullable
+    public Ingredient getIngredient(String name) {
+        for (var ingredient : metals) {
+            if (name.equals(ingredient.metal.name())) {
+                return ingredient;
+            }
+        }
+
+        return null;
+    }
+
+    public Ingredient[] getIngredients() {
+        return metals;
+    }
+
+    public IMetal getResult() {
+        return alloy;
     }
 
     public static class Builder {
 
-        String alloyName;
+        private final IMetal output;
 
-        String[] metalNames;
-        int[] standards;
-        int[] min;
-        int[] max;
+        private Ingredient[] ingredients;
 
-        int metalCount = 0;
+        private int metalCount;
 
-        public Builder(String alloyName)
-        {
-            metalNames = new String[3];
-            standards = new int[3];
-            min = new int[3];
-            max = new int[3];
-
-            this.alloyName = alloyName;
+        public Builder(IMetal output) {
+            this.output = output;
+            this.metalCount = 0;
+            ingredients = new Ingredient[3];
         }
 
         /**
          * @return the same Builder to chain calls
          */
-        public Builder addMetal(String metalName, int standard, int min, int max) {
+        public Builder addMetal(@NotNull IMetal metal, int ratio) {
+            Objects.requireNonNull(metal, "metal in alloy should not be null");
+
+            if (ratio < 1 || ratio > 64) {
+                throw new IllegalArgumentException("ingredient ratio in the alloy should be between 1 and 64");
+            }
+
             if (metalCount >= 3)
-                throw new RuntimeException("No more than 3 metals can be added to an alloy [use recursive alloys to employ more metals in the same alloy]");
-            this.metalNames[metalCount] = metalName;
-            this.standards[metalCount] = standard;
-            this.min[metalCount] = min;
-            this.max[metalCount] = max;
+                throw new IllegalStateException(String.format("No more than 3 metals can be added to an alloy, current alloy %s already has 3 ingredients", output.name()));
+
+            ingredients[metalCount] = new Ingredient(metal, ratio);
             metalCount++;
             return this;
         }
@@ -84,19 +82,7 @@ public class Alloy {
             if (metalCount < 2)
                 throw new IllegalStateException("Can't build Alloy with less than 2 ingredient metals!");
 
-            MixtureRatio standard;
-            if (metalCount > 2) {
-                standard = new MixtureRatio(metalNames[0], standards[0], metalNames[1], standards[1], metalNames[2], standards[2]);
-            }
-            else {
-                standard = new MixtureRatio(metalNames[0], standards[0], metalNames[1], standards[1]);
-            }
-
-            Alloy alloy = new Alloy(alloyName, standard);
-            for (int i = 0; i < metalCount; i++)
-                alloy.validRanges.put(metalNames[i], Range.closed(min[i], max[i]));
-
-            return alloy;
+            return new Alloy(output, ingredients);
         }
     }
 
