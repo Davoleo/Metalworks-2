@@ -1,7 +1,11 @@
 package net.davoleo.mettle.api.metal;
 
+import net.davoleo.mettle.api.metal.attribute.MetalModifier;
 import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MetalBuilder {
 
@@ -10,6 +14,7 @@ public class MetalBuilder {
     private int color = 0xCCCCCC;
     private int durability = 120;
     private int enchantability = 5;
+    private int meltingTemperature = 100;
 
     @Nullable
     private ToolStatsBuilder toolStats = null;
@@ -17,13 +22,15 @@ public class MetalBuilder {
     @Nullable
     private ArmorStatsBuilder armorStats = null;
 
+    private final List<MetalModifier> modifiers = new ArrayList<>();
+
     public MetalBuilder(String name) {
     }
 
     public IMetal build() {
         ToolStats tool = toolStats != null ? toolStats.build() : null;
         ArmorStats armor = armorStats != null ? armorStats.build() : null;
-        return new SimpleMetal(name, color, durability, enchantability, tool, armor, null);
+        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, null);
     }
 
     public MetalBuilder color(int color) {
@@ -41,9 +48,30 @@ public class MetalBuilder {
         return this;
     }
 
+    public MetalBuilder meltingTemperature(int meltingTemperature) {
+        this.meltingTemperature = meltingTemperature;
+        return this;
+    }
+
+    public MetalBuilder addModifier(MetalModifier modifier) {
+        for (MetalModifier m : modifiers) {
+            if (m.attribute() == modifier.attribute()) {
+                throw new IllegalArgumentException("Duplicate modifier attribute: " + modifier.attribute());
+            }
+        }
+
+        modifiers.add(modifier);
+        return this;
+    }
+
     public ToolStatsBuilder toolStats() {
         toolStats = new ToolStatsBuilder();
         return toolStats;
+    }
+
+    public ArmorStatsBuilder armorStats() {
+        armorStats = new ArmorStatsBuilder();
+        return armorStats;
     }
 
     public class ToolStatsBuilder {
