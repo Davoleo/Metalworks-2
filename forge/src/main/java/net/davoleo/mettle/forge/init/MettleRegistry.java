@@ -1,4 +1,4 @@
-package net.davoleo.mettle.init;
+package net.davoleo.mettle.forge.init;
 
 import net.davoleo.mettle.Mettle;
 import net.davoleo.mettle.registry.IMettleRegistry;

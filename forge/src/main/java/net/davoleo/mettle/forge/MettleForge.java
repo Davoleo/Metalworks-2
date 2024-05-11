@@ -1,7 +1,8 @@
-package net.davoleo.mettle;
+package net.davoleo.mettle.forge;
 
-import net.davoleo.mettle.init.MettlePackFinder;
-import net.davoleo.mettle.init.MettleRegistry;
+import net.davoleo.mettle.Mettle;
+import net.davoleo.mettle.forge.init.MettlePackFinder;
+import net.davoleo.mettle.forge.init.MettleRegistry;
 import net.davoleo.mettle.init.ModRegistry;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;

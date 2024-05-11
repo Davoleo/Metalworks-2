@@ -1,10 +1,10 @@
 {
   "required": true,
-  "package": "net.examplemod.mixin",
+  "package": "net.davoleo.mettle.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
-    "net.davoleo.mettle.mixin.MixinTitleScreen"
+    "MixinTitleScreen"
   ],
   "mixins": [
   ],

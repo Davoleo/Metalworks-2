@@ -27,6 +27,7 @@ public class MetalBuilder {
     private final MetalComponents components = new MetalComponents();
 
     public MetalBuilder(String name) {
+        this.name = name;
     }
 
     public IMetal build() {

@@ -1,7 +1,8 @@
-package net.davoleo.mettle.init;
+package net.davoleo.mettle.forge.init;
 
 import net.davoleo.mettle.api.IMettleIntegration;
 import net.davoleo.mettle.api.MettlePack;
+import net.davoleo.mettle.init.ModRegistry;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import org.objectweb.asm.Type;

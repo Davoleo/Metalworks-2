@@ -1,4 +1,4 @@
-package net.davoleo.mettle.util;
+package net.davoleo.mettle.forge.datagen;
 
 import net.minecraft.advancements.critereon.EnchantmentPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
