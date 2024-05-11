@@ -6,7 +6,7 @@ import net.davoleo.mettle.api.MettlePack;
 import net.davoleo.mettle.api.metal.Alloy;
 import net.davoleo.mettle.api.metal.IMetal;
 import net.davoleo.mettle.api.metal.SimpleMetal;
-import net.davoleo.mettle.api.registry.AbstractRegistry;
+import net.davoleo.mettle.api.registry.Registry;
 
 @MettlePack(modid = Mettle.MODID)
 public class CoreMetals implements IMettleIntegration {
@@ -16,12 +16,12 @@ public class CoreMetals implements IMettleIntegration {
             .build();
 
     @Override
-    public void registerMetals(AbstractRegistry<IMetal> registry) {
+    public void registerMetals(Registry<IMetal> registry) {
         registry.register(TIN.name(), TIN);
     }
 
     @Override
-    public void registerAlloys(AbstractRegistry<Alloy> registry) {
+    public void registerAlloys(Registry<Alloy> registry) {
 
     }
 }

@@ -5,7 +5,7 @@ import net.davoleo.mettle.api.MettlePack;
 import net.davoleo.mettle.api.metal.Alloy;
 import net.davoleo.mettle.api.metal.IMetal;
 import net.davoleo.mettle.api.metal.SimpleMetal;
-import net.davoleo.mettle.api.registry.AbstractRegistry;
+import net.davoleo.mettle.api.registry.Registry;
 
 @MettlePack(modid = "minecraft")
 public class VanillaMetals implements IMettleIntegration {
@@ -27,7 +27,7 @@ public class VanillaMetals implements IMettleIntegration {
             .build();
 
     @Override
-    public void registerMetals(AbstractRegistry<IMetal> registry) {
+    public void registerMetals(Registry<IMetal> registry) {
         registry.register(IRON.name(), IRON);
         registry.register(GOLD.name(), GOLD);
         registry.register(COPPER.name(), COPPER);
@@ -35,7 +35,7 @@ public class VanillaMetals implements IMettleIntegration {
     }
 
     @Override
-    public void registerAlloys(AbstractRegistry<Alloy> registry) {
+    public void registerAlloys(Registry<Alloy> registry) {
 
     }
 }

@@ -1,6 +1,5 @@
 package net.davoleo.mettle;
 
-import net.davoleo.mettle.capability.CapabilityInitializer;
 import net.davoleo.mettle.init.MettleRegistry;
 import net.davoleo.mettle.init.ModRegistry;
 import net.minecraft.world.item.CreativeModeTab;
@@ -47,10 +46,9 @@ public class MettleForge {
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(CapabilityInitializer.class);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(CapabilityInitializer::registerCapabilities);
 
         MettleRegistry.setup();
+
         ModRegistry.init();
     }
 
@@ -84,7 +82,5 @@ public class MettleForge {
     {
         // Do something when the server starts
         Mettle.LOGGER.info("HELLO from server starting");
-
-
     }
 }

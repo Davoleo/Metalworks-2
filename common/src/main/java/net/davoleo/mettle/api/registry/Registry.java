@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public class AbstractRegistry<T> {
+public class Registry<T> {
 
-    private String modId;
+    private final String modId;
 
     private final Map<String, T> registryMap;
 
-    AbstractRegistry(String modId)
+    public Registry(String modId)
     {
         this.modId = modId;
         registryMap = new HashMap<>();
@@ -32,6 +32,7 @@ public class AbstractRegistry<T> {
     public int entriesCount() {
         return registryMap.size();
     }
+
 
     public T register(String name, @NotNull T object)
     {
