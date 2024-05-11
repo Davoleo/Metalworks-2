@@ -11,13 +11,13 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Supplier;
 
-public class MettleRegistry implements IMettleRegistry {
+public class MettleRegistryForge implements IMettleRegistry {
 
     public static DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Mettle.MODID);
     public static DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Mettle.MODID);
 
     public static void setup() {
-        Mettle.registry = new MettleRegistry();
+        Mettle.registry = new MettleRegistryForge();
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BLOCKS.register(bus);
         ITEMS.register(bus);

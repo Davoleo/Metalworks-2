@@ -2,7 +2,8 @@ package net.davoleo.mettle.forge;
 
 import net.davoleo.mettle.Mettle;
 import net.davoleo.mettle.forge.init.MettlePackFinder;
-import net.davoleo.mettle.forge.init.MettleRegistry;
+import net.davoleo.mettle.forge.init.MettleRegistryForge;
+import net.davoleo.mettle.forge.util.PlatformUtilsForge;
 import net.davoleo.mettle.init.ModRegistry;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -49,7 +50,8 @@ public class MettleForge {
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
 
-        MettleRegistry.setup();
+        Mettle.platformUtils = new PlatformUtilsForge();
+        MettleRegistryForge.setup();
         MettlePackFinder.doTheStuff();
         ModRegistry.init();
     }

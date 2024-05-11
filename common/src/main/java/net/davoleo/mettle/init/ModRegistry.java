@@ -23,10 +23,10 @@ public class ModRegistry {
     protected static final List<RegistryEntry<Item>> ITEMS = Lists.newArrayList();
 
     public static void init() {
-        BLOCKS.forEach(regObj -> Mettle.registry.registerBlock(regObj.name(), regObj.entry()));
-        ITEMS.forEach(regObj -> Mettle.registry.registerItem(regObj.name(), regObj.entry()));
         MettleBlocks.init();
         MettleItems.init();
+        BLOCKS.forEach(regObj -> Mettle.registry.registerBlock(regObj.name(), regObj.entry()));
+        ITEMS.forEach(regObj -> Mettle.registry.registerItem(regObj.name(), regObj.entry()));
     }
 
     public static void registerPack(String modid, IMettleIntegration pack) {
