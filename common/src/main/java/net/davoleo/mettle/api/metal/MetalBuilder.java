@@ -24,13 +24,15 @@ public class MetalBuilder {
 
     private final List<MetalModifier> modifiers = new ArrayList<>();
 
+    private final MetalComponents components = new MetalComponents();
+
     public MetalBuilder(String name) {
     }
 
     public IMetal build() {
         ToolStats tool = toolStats != null ? toolStats.build() : null;
         ArmorStats armor = armorStats != null ? armorStats.build() : null;
-        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, null);
+        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, components);
     }
 
     public MetalBuilder color(int color) {
@@ -72,6 +74,18 @@ public class MetalBuilder {
     public ArmorStatsBuilder armorStats() {
         armorStats = new ArmorStatsBuilder();
         return armorStats;
+    }
+
+    public MetalBuilder component(ComponentType type) {
+        this.components.set(type);
+        return this;
+    }
+
+    public MetalBuilder components(ComponentType... types) {
+        for (ComponentType type : types)
+            component(type);
+
+        return this;
     }
 
     public class ToolStatsBuilder {

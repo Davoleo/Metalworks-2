@@ -1,5 +1,6 @@
 package net.davoleo.mettle;
 
+import net.davoleo.mettle.init.MettlePackFinder;
 import net.davoleo.mettle.init.MettleRegistry;
 import net.davoleo.mettle.init.ModRegistry;
 import net.minecraft.world.item.CreativeModeTab;
@@ -48,7 +49,7 @@ public class MettleForge {
         MinecraftForge.EVENT_BUS.register(this);
 
         MettleRegistry.setup();
-
+        MettlePackFinder.doTheStuff();
         ModRegistry.init();
     }
 

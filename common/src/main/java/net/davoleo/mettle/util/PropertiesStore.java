@@ -8,8 +8,8 @@ import net.minecraft.world.level.material.Material;
 public class PropertiesStore {
 
     public static BlockBehaviour.Properties oreProperties(IMetal metal) {
-        return new Block.Properties.of(Material.STONE)
-                .strength(metal.getProperties().hardness() / 2);
+        return Block.Properties.of(Material.STONE)
+                .destroyTime(1.5F); //TODO: maybe customize
     }
 
 }

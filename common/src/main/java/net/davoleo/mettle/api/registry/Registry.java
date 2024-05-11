@@ -11,6 +11,10 @@ import java.util.function.BiConsumer;
 
 public class Registry<T> {
 
+    public interface Nameable {
+        String name();
+    }
+
     private final String modId;
 
     private final Map<String, T> registryMap;
@@ -33,6 +37,18 @@ public class Registry<T> {
         return registryMap.size();
     }
 
+    public T register(T value)
+    {
+        if (!(value instanceof Nameable v)) {
+            throw new IllegalArgumentException("Implicitly named register, only works with Nameable objects");
+        }
+
+        if (registryMap.containsKey(v.name())) {
+            throw new IllegalStateException("Duplicate registration");
+        }
+
+        return this.registryMap.put(v.name(), value);
+    }
 
     public T register(String name, @NotNull T object)
     {
@@ -50,6 +66,11 @@ public class Registry<T> {
     {
         Objects.requireNonNull(name,"Metal Name cannot be null");
         return this.registryMap.get(name);
+    }
+
+    public boolean has(@NotNull String name) {
+        Objects.requireNonNull(name,"Metal Name cannot be null");
+        return this.registryMap.containsKey(name);
     }
 
     public String getMod() {

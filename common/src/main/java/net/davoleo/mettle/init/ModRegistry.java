@@ -12,20 +12,21 @@ import net.minecraft.world.level.block.Block;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ModRegistry {
 
-    private static final InternalRegistry<IMetal> METALS = new InternalRegistry<>();
-    private static final InternalRegistry<Alloy> ALLOYS = new InternalRegistry<>();
+    protected static final InternalRegistry<IMetal> METALS = new InternalRegistry<>();
+    protected static final InternalRegistry<Alloy> ALLOYS = new InternalRegistry<>();
 
-    private static final List<RegistryEntry<Block>> BLOCKS = Lists.newArrayList();
-    private static final List<RegistryEntry<Item>> ITEMS = Lists.newArrayList();
-
+    protected static final List<RegistryEntry<Block>> BLOCKS = Lists.newArrayList();
+    protected static final List<RegistryEntry<Item>> ITEMS = Lists.newArrayList();
 
     public static void init() {
         BLOCKS.forEach(regObj -> Mettle.registry.registerBlock(regObj.name(), regObj.entry()));
         ITEMS.forEach(regObj -> Mettle.registry.registerItem(regObj.name(), regObj.entry()));
         MettleBlocks.init();
+        MettleItems.init();
     }
 
     public static void registerPack(String modid, IMettleIntegration pack) {
@@ -35,5 +36,9 @@ public class ModRegistry {
         pack.registerAlloys(alloyRegistry);
         METALS.merge(metalRegistry);
         ALLOYS.merge(alloyRegistry);
+    }
+
+    protected static <T> RegistryEntry<T> rentry(String name, Supplier<T> supplier) {
+        return new RegistryEntry<>(name, supplier);
     }
 }

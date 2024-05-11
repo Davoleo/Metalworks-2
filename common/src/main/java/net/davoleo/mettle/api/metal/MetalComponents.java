@@ -1,39 +1,29 @@
 package net.davoleo.mettle.api.metal;
 
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.Nullable;
-
 /**
  * If methods' implementation return null,
  * items and blocks won't be added by Mettle,
  * otherwise the mod's features will be used
  */
-public class MetalComponents {
+public final class MetalComponents {
 
-    @Nullable
-    Block getBlock() {
-        return null;
+    private long flags;
+
+    public MetalComponents(long flags) {
+        this.flags = flags;
     }
 
-    @Nullable
-    Item getIngot() {
-        return null;
+    public MetalComponents(ComponentType... flags) {
+        for (ComponentType flag : flags) {
+            this.set(flag);
+        }
     }
 
-    @Nullable
-    Item getNugget() {
-        return null;
+    protected void set(ComponentType type) {
+        flags |= type.getFlag();
     }
 
-    @Nullable
-    Item getRod() {
-        return null;
+    public boolean get(ComponentType type) {
+        return (type.getFlag() & flags) != 0;
     }
-
-    @Nullable
-    Item getPlate() {
-        return null;
-    }
-
 }

@@ -1,10 +1,11 @@
 package net.davoleo.mettle.api.metal;
 
 import net.davoleo.mettle.api.metal.attribute.MetalModifier;
+import net.davoleo.mettle.api.registry.Registry;
 
 import java.util.List;
 
-public interface IMetal {
+public interface IMetal extends Registry.Nameable {
 
     /**
      * The name: unique identifier of a metal
