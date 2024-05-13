@@ -16,11 +16,11 @@ import java.util.function.Supplier;
 
 public class ModRegistry {
 
-    protected static final InternalRegistry<IMetal> METALS = new InternalRegistry<>();
+    public static final InternalRegistry<IMetal> METALS = new InternalRegistry<>();
     protected static final InternalRegistry<Alloy> ALLOYS = new InternalRegistry<>();
 
-    protected static final List<RegistryEntry<Block>> BLOCKS = Lists.newArrayList();
-    protected static final List<RegistryEntry<Item>> ITEMS = Lists.newArrayList();
+    protected static final List<RegistryEntry<? extends Block>> BLOCKS = Lists.newArrayList();
+    protected static final List<RegistryEntry<? extends Item>> ITEMS = Lists.newArrayList();
 
     public static void init() {
         MettleBlocks.init();

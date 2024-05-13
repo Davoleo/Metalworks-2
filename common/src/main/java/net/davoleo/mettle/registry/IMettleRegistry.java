@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 
 public interface IMettleRegistry {
 
-    void registerBlock(String name, Supplier<Block> block);
+    void registerBlock(String name, Supplier<? extends Block> block);
 
-    void registerItem(String name, Supplier<Item> item);
+    void registerItem(String name, Supplier<? extends Item> item);
 
 }

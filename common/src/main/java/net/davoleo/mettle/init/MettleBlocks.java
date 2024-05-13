@@ -1,7 +1,10 @@
 package net.davoleo.mettle.init;
 
+import com.google.common.base.Suppliers;
 import net.davoleo.mettle.api.metal.ComponentType;
 import net.davoleo.mettle.block.MettleOreBlock;
+
+import java.util.function.Supplier;
 
 public class MettleBlocks extends ModRegistry {
 
@@ -10,7 +13,9 @@ public class MettleBlocks extends ModRegistry {
         //Register Ores
         METALS.forEach((name, metal) -> {
             if (metal.value().components().get(ComponentType.ORE)) {
-                BLOCKS.add(rentry(name + "_ore", () -> new MettleOreBlock(metal.value())));
+                Supplier<MettleOreBlock> oreBlock = Suppliers.memoize(() -> new MettleOreBlock(metal.value()));
+                BLOCKS.add(rentry(name + "_ore", oreBlock));
+                MettleItems.registerSimpleBlockItem(name + "_ore", oreBlock);
             }
         });
     }

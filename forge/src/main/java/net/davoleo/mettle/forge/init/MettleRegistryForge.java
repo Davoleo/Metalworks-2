@@ -5,7 +5,6 @@ import net.davoleo.mettle.registry.IMettleRegistry;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -18,18 +17,20 @@ public class MettleRegistryForge implements IMettleRegistry {
 
     public static void setup() {
         Mettle.registry = new MettleRegistryForge();
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    }
+
+    public static void registerOnBus(IEventBus bus) {
         BLOCKS.register(bus);
         ITEMS.register(bus);
     }
 
     @Override
-    public void registerBlock(String name, Supplier<Block> block) {
+    public void registerBlock(String name, Supplier<? extends Block> block) {
         BLOCKS.register(name, block);
     }
 
     @Override
-    public void registerItem(String name, Supplier<Item> item) {
+    public void registerItem(String name, Supplier<? extends Item> item) {
         ITEMS.register(name, item);
     }
 }
