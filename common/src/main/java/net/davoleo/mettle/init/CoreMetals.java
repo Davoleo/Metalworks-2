@@ -14,6 +14,16 @@ public class CoreMetals implements IMettleIntegration {
 
     public static final IMetal TIN = SimpleMetal
             .wizard("tin")
+            .enchantability(2)
+            .toolStats(it -> it
+                    .attackSpeed(4)
+                    .harvestLevel(4)
+            )
+            .armorStats(b -> b
+                    .movementSpeed(2)
+                    .maxHealth(4)
+                    .knockbackResistance(2)
+            )
             .component(ComponentType.ORE)
             .build();
 

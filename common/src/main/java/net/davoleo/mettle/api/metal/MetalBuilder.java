@@ -1,6 +1,7 @@
 package net.davoleo.mettle.api.metal;
 
 import net.davoleo.mettle.api.metal.attribute.MetalModifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +27,11 @@ public class MetalBuilder {
 
     private final MetalComponents components = new MetalComponents();
 
+    private ResourceLocation[] oreFillerTextures = new ResourceLocation[] {
+            new ResourceLocation("stone"),
+            new ResourceLocation("deepslate"),
+    };
+
     public MetalBuilder(String name) {
         this.name = name;
     }
@@ -33,7 +39,7 @@ public class MetalBuilder {
     public IMetal build() {
         ToolStats tool = toolStats != null ? toolStats.build() : null;
         ArmorStats armor = armorStats != null ? armorStats.build() : null;
-        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, components);
+        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, components, oreFillerTextures);
     }
 
     public MetalBuilder color(int color) {
@@ -67,14 +73,16 @@ public class MetalBuilder {
         return this;
     }
 
-    public ToolStatsBuilder toolStats() {
-        toolStats = new ToolStatsBuilder();
-        return toolStats;
+    public MetalBuilder toolStats(SmolConsumer<ToolStatsBuilder> consumer) {
+        this.toolStats = new ToolStatsBuilder();
+        consumer.accept(toolStats);
+        return this;
     }
 
-    public ArmorStatsBuilder armorStats() {
-        armorStats = new ArmorStatsBuilder();
-        return armorStats;
+    public MetalBuilder armorStats(SmolConsumer<ArmorStatsBuilder> consumer) {
+        this.armorStats = new ArmorStatsBuilder();
+        consumer.accept(armorStats);
+        return this;
     }
 
     public MetalBuilder component(ComponentType type) {
@@ -82,10 +90,24 @@ public class MetalBuilder {
         return this;
     }
 
+    public MetalBuilder oreFillerTextures(ResourceLocation... texture) {
+
+        for (ResourceLocation r : texture) {
+            var p = r.getPath();
+            for (ResourceLocation r1 : texture) {
+                if (!r.equals(r1) && p.equals(r1.getPath())) {
+                    throw new IllegalArgumentException("There can't be 2 ore filler textures with the same path: (" + r + ", " + r1 + ')');
+                }
+            }
+        }
+
+        oreFillerTextures = texture;
+        return this;
+    }
+
     public MetalBuilder components(ComponentType... types) {
         for (ComponentType type : types)
             component(type);
-
         return this;
     }
 
@@ -189,5 +211,10 @@ public class MetalBuilder {
         public MetalBuilder metal() {
             return MetalBuilder.this;
         }
+    }
+
+    @FunctionalInterface
+    public interface SmolConsumer<T> {
+        void accept(T b);
     }
 }
