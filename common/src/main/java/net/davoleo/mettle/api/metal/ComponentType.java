@@ -1,14 +1,22 @@
 package net.davoleo.mettle.api.metal;
 
+import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
 
 public enum ComponentType {
+    @SerializedName("block")
     BLOCK,
+    @SerializedName("ingot")
     INGOT,
+    @SerializedName("nugget")
     NUGGET,
+    @SerializedName("ore")
     ORE,
+    @SerializedName("rod")
     ROD,
+    @SerializedName("plate")
     PLATE,
+    @SerializedName("gear")
     GEAR,
     ;
 
