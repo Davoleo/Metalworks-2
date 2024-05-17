@@ -1,5 +1,5 @@
 {
-  "assets/mettle/blockstates/§metal§_ore.template.json": "net.davoleo.mettle.api.metal.ComponentType.ORE",
-  "assets/mettle/models/block/§metal§_ore.template.json": "net.davoleo.mettle.api.metal.ComponentType.ORE",
-  "data/mettle/loot_tables/blocks/§metal§_ore.template.json": "net.davoleo.mettle.api.metal.ComponentType.ORE"
+  "assets/mettle/blockstates/§metal§_§filler§_ore.template.json": "ore",
+  "assets/mettle/models/block/§metal§_§filler§_ore.template.json": "ore",
+  "data/mettle/loot_tables/blocks/§metal§_§filler§_ore.template.json": "ore"
 }
