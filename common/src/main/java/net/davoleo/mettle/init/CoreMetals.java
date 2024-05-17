@@ -18,11 +18,14 @@ public class CoreMetals implements IMettleIntegration {
             .toolStats(it -> it
                     .attackSpeed(4)
                     .harvestLevel(4)
+                    .damage(1)
+                    .efficiency(1)
             )
             .armorStats(b -> b
                     .movementSpeed(2)
                     .maxHealth(4)
                     .knockbackResistance(2)
+                    .damageReduction(1,1,1,1)
             )
             .component(ComponentType.ORE)
             .build();
