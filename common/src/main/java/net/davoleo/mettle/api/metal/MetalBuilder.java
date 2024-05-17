@@ -29,7 +29,7 @@ public class MetalBuilder {
 
     private ResourceLocation[] oreFillerTextures = new ResourceLocation[] {
             new ResourceLocation("stone"),
-            new ResourceLocation("deepslate"),
+            new ResourceLocation("block/deepslate/rrer/cock"),
     };
 
     public MetalBuilder(String name) {
