@@ -138,16 +138,16 @@ public class VirtualPackResources extends AbstractPackResources {
     @Override
     public Collection<ResourceLocation> getResources(PackType type, String namespace, String pathIn, int maxDepth, Predicate<String> filter) {
         //System.out.println("getResources(" + type + " " + namespace + " " + pathIn + ")");
-        String prefix = type.getDirectory() + '/' + namespace + '/' + pathIn + "/";
+        String root = type.getDirectory() + '/' + namespace + '/';
+        String entirePath = root + pathIn + "/";
 
-        Collection<ResourceLocation> a = compiledToTemplates
+        return compiledToTemplates
                 .keySet()
                 .stream()
-                .filter(path -> path.startsWith(prefix) && (path.split("/").length - 2) <= maxDepth) //TODO: maxDepth condition : Verify
+                .filter(path -> path.startsWith(entirePath) && (entirePath.split("/").length - 2) <= maxDepth) //TODO: maxDepth condition : Verify
                 .filter(filter)
-                .map(string -> new ResourceLocation(Mettle.MODID, string.replace(prefix, "")))
+                .map(string -> new ResourceLocation(namespace, string.replace(root, "")))
                 .toList();
-        return a;
     }
 
     @Nullable

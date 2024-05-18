@@ -24,7 +24,7 @@
                   }
                 }
               ],
-              "name": "mettle:§metal§_ore"
+              "name": "mettle:§metal§_§filler§_ore"
             },
             {
               "type": "minecraft:item",
