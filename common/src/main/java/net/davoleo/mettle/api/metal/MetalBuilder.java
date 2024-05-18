@@ -1,12 +1,14 @@
 package net.davoleo.mettle.api.metal;
 
+import com.google.common.collect.Sets;
+import net.davoleo.mettle.api.block.OreVariant;
 import net.davoleo.mettle.api.metal.attribute.MetalModifier;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class MetalBuilder {
 
@@ -27,10 +29,7 @@ public class MetalBuilder {
 
     private final MetalComponents components = new MetalComponents();
 
-    private ResourceLocation[] oreFillerTextures = new ResourceLocation[] {
-            new ResourceLocation("stone"),
-            new ResourceLocation("deepslate"),
-    };
+    private Set<OreVariant> oreVariants = Sets.immutableEnumSet(OreVariant.STONE);
 
     public MetalBuilder(String name) {
         this.name = name;
@@ -39,7 +38,7 @@ public class MetalBuilder {
     public IMetal build() {
         ToolStats tool = toolStats != null ? toolStats.build() : null;
         ArmorStats armor = armorStats != null ? armorStats.build() : null;
-        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, components, oreFillerTextures);
+        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, components, oreVariants);
     }
 
     public MetalBuilder color(int color) {
@@ -90,18 +89,8 @@ public class MetalBuilder {
         return this;
     }
 
-    public MetalBuilder oreFillerTextures(ResourceLocation... texture) {
-
-        for (ResourceLocation r : texture) {
-            var p = r.getPath();
-            for (ResourceLocation r1 : texture) {
-                if (!r.equals(r1) && p.equals(r1.getPath())) {
-                    throw new IllegalArgumentException("There can't be 2 ore filler textures with the same path: (" + r + ", " + r1 + ')');
-                }
-            }
-        }
-
-        oreFillerTextures = texture;
+    public MetalBuilder oreVariants(OreVariant... variants) {
+        oreVariants = Sets.immutableEnumSet(variants[0], variants);
         return this;
     }
 

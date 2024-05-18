@@ -1,51 +1,50 @@
 package net.davoleo.mettle.data;
 
-import net.davoleo.mettle.api.metal.ComponentType;
+import com.google.common.collect.Sets;
+import net.davoleo.mettle.api.block.OreVariant;
 import net.davoleo.mettle.api.metal.IMetal;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public enum TemplateVariables {
-    METAL("§metal§", iMetal -> true, iMetal -> new String[]{ iMetal.name() }),
-    FILLER_BLOCK("§filler§",
-            iMetal -> iMetal.components().get(ComponentType.ORE),
-            iMetal -> Arrays.stream(iMetal.oreVariantsTextures())
-                    .map(ResourceLocation::getPath)
-                    .toArray(String[]::new)
-    ),
+public enum TemplateVariable {
+    METAL("metal", (iMetal) -> Set.of(IReplacement.joint(iMetal.name()))),
+    FILLER_BLOCK("filler", (iMetal) -> {
+        Set<IReplacement> replacements = Sets.newHashSet();
+        for (OreVariant variant : iMetal.oreVariants()) {
+            replacements.add(IReplacement.split(variant.toString(), variant.getTextureLocation().toString()));
+        }
+        return replacements;
+    })
     ;
 
-    private final String varName;
-    private final Predicate<IMetal> shouldReplace;
-    private final Function<IMetal, String[]> result;
+    public static final Pattern PATTERN = Pattern.compile("§.*?§");
 
-    TemplateVariables(String varName, Predicate<IMetal> shouldReplace, Function<IMetal, String[]> result) {
+    private final String varName;
+    private final Function<IMetal, Set<IReplacement>> getReplacementsFun;
+
+
+    TemplateVariable(String varName, Function<IMetal, Set<IReplacement>> result) {
         this.varName = varName;
-        this.shouldReplace = shouldReplace;
-        this.result = result;
+        this.getReplacementsFun = result;
     }
 
     public String varName() {
         return varName;
     }
 
+    public String var() {
+        return '§' + varName + '§';
+    }
 
 
-
-
-
+    @Deprecated
     public static Iterable<Tuple<String, String>> getVariables(String resourceName, String template) {
         Stream.Builder<Tuple<String, String>> stream = Stream.builder();
-
-        Pattern pattern = Pattern.compile("§.*?§");
-
 
         var splitTemplate = template.split("§");
         assert splitTemplate.length % 2 != 0;
@@ -70,18 +69,16 @@ public enum TemplateVariables {
     }
 
     @Nullable
-    public static TemplateVariables getTemplateVariable(String template)
+    public static TemplateVariable getTemplateVariable(String template)
     {
-
-
-        for (TemplateVariables value : TemplateVariables.values()) {
-            if(value.varName.equals(template))
+        for (TemplateVariable value : TemplateVariable.values()) {
+            if(value.var().equals(template))
                 return value;
         }
         return null;
     }
 
-    public String[] getResult(IMetal iMetal) {
-        return this.result.apply(iMetal);
+    public Set<IReplacement> getReplacements(IMetal iMetal) {
+        return this.getReplacementsFun.apply(iMetal);
     }
 }

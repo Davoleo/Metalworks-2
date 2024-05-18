@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "mettle:block/§metal§_§filler§_ore"
+      "model": "mettle:block/§metal§_§path_filler§_ore"
     }
   }
 }

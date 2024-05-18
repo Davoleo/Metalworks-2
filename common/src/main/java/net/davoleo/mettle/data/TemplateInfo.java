@@ -1,4 +1,4 @@
 package net.davoleo.mettle.data;
 
-public record TemplateInfo(String template, String[] replaces) {
+public record TemplateInfo(String template, IReplacement[] replacements) {
 }

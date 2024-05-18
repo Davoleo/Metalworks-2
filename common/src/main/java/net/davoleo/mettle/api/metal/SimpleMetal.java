@@ -1,9 +1,10 @@
 package net.davoleo.mettle.api.metal;
 
+import net.davoleo.mettle.api.block.OreVariant;
 import net.davoleo.mettle.api.metal.attribute.MetalModifier;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
+import java.util.Set;
 
 public record SimpleMetal(
         String name,
@@ -15,7 +16,7 @@ public record SimpleMetal(
         ArmorStats armorStats,
         List<MetalModifier> modifiers,
         MetalComponents components,
-        ResourceLocation[] oreVariantsTextures
+        Set<OreVariant> oreVariants
 ) implements IMetal {
 
     public static MetalBuilder wizard(String name) {

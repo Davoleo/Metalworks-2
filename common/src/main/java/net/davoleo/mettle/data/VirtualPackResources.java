@@ -25,9 +25,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,8 +36,6 @@ public class VirtualPackResources extends AbstractPackResources {
 
     private final Map<String, ComponentType> resourceConditions;
     private final Map<String, TemplateInfo> compiledToTemplates;
-
-    private final Pattern variablePattern = Pattern.compile("§.*?§");
 
     public VirtualPackResources() {
         super(new File("AWOWA"));
@@ -61,32 +57,7 @@ public class VirtualPackResources extends AbstractPackResources {
                     .map(source::relativize)
                     .filter(path -> path.toString().endsWith(".template.json"))
                     .map(path -> Joiner.on("/").join(path))
-                    .flatMap(path -> {
-                        Stream.Builder<Pair<String, TemplateInfo>> resources = Stream.builder();
-                        ModRegistry.METALS.forEach((name, metal) -> {
-
-                            var component = resourceConditions.get(path);
-                            if (component != null && !metal.value().components().get(component)) {
-                                return;
-                            }
-
-
-                            List<TemplateVariables> foundVariables = new ArrayList<>();
-                            Matcher matcher = variablePattern.matcher(path);
-                            while(matcher.find())
-                                foundVariables.add(TemplateVariables.getTemplateVariable(matcher.group()));
-
-                            if(!foundVariables.isEmpty())
-                                backtracking(instance -> {
-                                    String instancedFile = path.replace(".template", "");
-                                    for (int i = 0;i < instance.length;i++)
-                                        instancedFile = instancedFile.replace(foundVariables.get(i).varName(), instance[i]);
-                                    resources.add(Pair.of(instancedFile, new TemplateInfo(path, instance)));
-                                },foundVariables,0,new LinkedList<>(), metal.value());
-
-                        });
-                        return resources.build();
-                    })
+                    .flatMap(this::generateReplacedResources)
                     .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
             System.out.println(compiledToTemplates);
@@ -97,6 +68,53 @@ public class VirtualPackResources extends AbstractPackResources {
 
         System.out.println("VIRTUAL PACK source:" +  source);
 
+    }
+
+    private Stream<Pair<String, TemplateInfo>> generateReplacedResources(String templatePath) {
+        Stream.Builder<Pair<String, TemplateInfo>> resources = Stream.builder();
+        ModRegistry.METALS.forEach((name, metal) -> {
+
+            var component = resourceConditions.get(templatePath);
+            if (component != null && !metal.value().components().get(component)) {
+                return;
+            }
+
+            Matcher matcher = TemplateVariable.PATTERN.matcher(templatePath);
+            List<TemplateVariable> variables = new ArrayList<>();
+            while(matcher.find())
+                variables.add(Objects.requireNonNull(TemplateVariable.getTemplateVariable(matcher.group())));
+
+
+            if(!variables.isEmpty()) {
+                combineTemplateVarReplacements(variables, 0, new LinkedList<>(), replacements -> {
+                    String instancedFile = templatePath.replace(".template", "");
+                    int i = 0;
+                    for (IReplacement replacement : replacements) {
+                        instancedFile = instancedFile.replace(variables.get(i++).var(), replacement.pathName());
+                    }
+
+                    resources.add(Pair.of(instancedFile, new TemplateInfo(templatePath, replacements)));
+                }, metal.value());
+            }
+        });
+        return resources.build();
+    }
+
+    private void combineTemplateVarReplacements(List<TemplateVariable> templateVariables, int index, LinkedList<IReplacement> replacements, Consumer<IReplacement[]> callback, IMetal metal)
+    {
+        //already backtracked through all template variables
+        if(index >= templateVariables.size())
+        {
+            //Replacement combination is complete callback to output
+            callback.accept(replacements.toArray(IReplacement[]::new));
+            return;
+        }
+        TemplateVariable variable = templateVariables.get(index);
+        for(var iterateEveryVariation : variable.getReplacements(metal)) {
+            replacements.add(iterateEveryVariation);
+            combineTemplateVarReplacements(templateVariables, index + 1, replacements, callback, metal);
+            replacements.removeLast();
+        }
     }
 
     @NotNull
@@ -118,12 +136,13 @@ public class VirtualPackResources extends AbstractPackResources {
 
         var templateContent = Files.readString(source.resolve(template.template()));
 
-        Matcher matcher = variablePattern.matcher(template.template());
+        Matcher matcher = TemplateVariable.PATTERN.matcher(template.template());
         int index = 0;
         while (matcher.find())
         {
-            TemplateVariables templateVariables = TemplateVariables.getTemplateVariable(matcher.group());
-            templateContent = templateContent.replaceAll(templateVariables.varName(), template.replaces()[index]);
+            TemplateVariable templateVariables = TemplateVariable.getTemplateVariable(matcher.group());
+            templateContent = templateContent.replaceAll(templateVariables.var(), template.replacements()[index].name());
+            templateContent = templateContent.replaceAll("§path_" + templateVariables.varName() + '§', template.replacements()[index].pathName());
             index++;
         }
         return new ByteArrayInputStream(templateContent.getBytes());
@@ -139,7 +158,7 @@ public class VirtualPackResources extends AbstractPackResources {
     public Collection<ResourceLocation> getResources(PackType type, String namespace, String pathIn, int maxDepth, Predicate<String> filter) {
         //System.out.println("getResources(" + type + " " + namespace + " " + pathIn + ")");
         String root = type.getDirectory() + '/' + namespace + '/';
-        String entirePath = root + pathIn + "/";
+        String entirePath = root + pathIn + '/';
 
         return compiledToTemplates
                 .keySet()
@@ -170,20 +189,4 @@ public class VirtualPackResources extends AbstractPackResources {
 
     @Override
     public void close() {}
-
-    public static void backtracking(Consumer<String[]> fun, List<TemplateVariables> templateVariables, int index, LinkedList<String> replaces, IMetal metal)
-    {
-        if(index >= templateVariables.size())
-        {
-            //REPLACES IS COMPLETE ADD NEW TEMPLATE INFO
-            fun.accept(replaces.toArray(String[]::new));
-            return;
-        }
-        TemplateVariables variable = templateVariables.get(index);
-        for(String iterateEveryVariation : variable.getResult(metal)) {
-            replaces.add(iterateEveryVariation);
-            backtracking(fun, templateVariables, index + 1, replaces, metal);
-            replaces.removeLast();
-        }
-    }
 }

@@ -1,10 +1,11 @@
 package net.davoleo.mettle.api.metal;
 
+import net.davoleo.mettle.api.block.OreVariant;
 import net.davoleo.mettle.api.metal.attribute.MetalModifier;
 import net.davoleo.mettle.api.registry.Registry;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
+import java.util.Set;
 
 public interface IMetal extends Registry.Nameable {
 
@@ -56,6 +57,6 @@ public interface IMetal extends Registry.Nameable {
 
     MetalComponents components();
 
-    ResourceLocation[] oreVariantsTextures();
+    Set<OreVariant> oreVariants();
 
 }
