@@ -4,6 +4,7 @@ import net.davoleo.mettle.api.metal.ComponentType;
 import net.davoleo.mettle.api.metal.IMetal;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -35,15 +36,10 @@ public enum TemplateVariables {
         return varName;
     }
 
-//    public static String replaceAll(String input, IMetal metal) {
-//        String result = input;
-//        for (TemplateVariables var : TemplateVariables.values()) {
-//            if (var.shouldReplace.test(metal)) {
-//                result = input.replaceAll(var.varName(), var.result.apply(metal));
-//            }
-//        }
-//        return result;
-//    }
+
+
+
+
 
     public static Iterable<Tuple<String, String>> getVariables(String resourceName, String template) {
         Stream.Builder<Tuple<String, String>> stream = Stream.builder();
@@ -71,5 +67,21 @@ public enum TemplateVariables {
 
         return () -> stream.build().iterator();
         // / or \ or _ or .     Arrays.stream(resourceName.split("[\\\\/_.]"))
+    }
+
+    @Nullable
+    public static TemplateVariables getTemplateVariable(String template)
+    {
+
+
+        for (TemplateVariables value : TemplateVariables.values()) {
+            if(value.varName.equals(template))
+                return value;
+        }
+        return null;
+    }
+
+    public String[] getResult(IMetal iMetal) {
+        return this.result.apply(iMetal);
     }
 }

@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import net.davoleo.mettle.Mettle;
 import net.davoleo.mettle.api.metal.ComponentType;
+import net.davoleo.mettle.api.metal.IMetal;
 import net.davoleo.mettle.init.ModRegistry;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -21,10 +22,12 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,7 +37,9 @@ public class VirtualPackResources extends AbstractPackResources {
     private Path source;
 
     private final Map<String, ComponentType> resourceConditions;
-    private final Map<String, String> compiledToTemplates;
+    private final Map<String, TemplateInfo> compiledToTemplates;
+
+    private final Pattern variablePattern = Pattern.compile("§.*?§");
 
     public VirtualPackResources() {
         super(new File("AWOWA"));
@@ -43,6 +48,7 @@ public class VirtualPackResources extends AbstractPackResources {
             String newPath = source.toString().replace(Mettle.platformUtils.getModLoader().toString(), "common");
             this.source = Path.of(newPath);
         }
+
 
         try (var files = Files.walk(source);
              JsonReader conditionsReader = new JsonReader(new InputStreamReader(getRootResource("conditions.json")))
@@ -53,10 +59,10 @@ public class VirtualPackResources extends AbstractPackResources {
 
             compiledToTemplates = files
                     .map(source::relativize)
-                    .filter(path -> !path.toString().endsWith(".mcmeta") && !path.toString().endsWith("conditions.json"))
+                    .filter(path -> path.toString().endsWith(".template.json"))
                     .map(path -> Joiner.on("/").join(path))
                     .flatMap(path -> {
-                        Stream.Builder<Pair<String, String>> resources = Stream.builder();
+                        Stream.Builder<Pair<String, TemplateInfo>> resources = Stream.builder();
                         ModRegistry.METALS.forEach((name, metal) -> {
 
                             var component = resourceConditions.get(path);
@@ -65,17 +71,25 @@ public class VirtualPackResources extends AbstractPackResources {
                             }
 
 
+                            List<TemplateVariables> foundVariables = new ArrayList<>();
+                            Matcher matcher = variablePattern.matcher(path);
+                            while(matcher.find())
+                                foundVariables.add(TemplateVariables.getTemplateVariable(matcher.group()));
 
-                            //TODO : Generic Replace? replace more? more loops? when?
-                            String replaced = path
-                                    .replace("§metal§", name)
-                                    .replace(".template", "");
+                            if(!foundVariables.isEmpty())
+                                backtracking(instance -> {
+                                    String instancedFile = path.replace(".template", "");
+                                    for (int i = 0;i < instance.length;i++)
+                                        instancedFile = instancedFile.replace(foundVariables.get(i).varName(), instance[i]);
+                                    resources.add(Pair.of(instancedFile, new TemplateInfo(path, instance)));
+                                },foundVariables,0,new LinkedList<>(), metal.value());
 
-                            resources.add(Pair.of(replaced, path));
                         });
                         return resources.build();
                     })
                     .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+
+            System.out.println(compiledToTemplates);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -97,14 +111,20 @@ public class VirtualPackResources extends AbstractPackResources {
     @Override
     protected InputStream getResource(String resourcePath) throws IOException {
 
-        String template = compiledToTemplates.get(resourcePath);
+        TemplateInfo template = compiledToTemplates.get(resourcePath);
 
         if (template == null)
             throw new ResourcePackFileNotFoundException(new File("METTLE_VIRTUAL_PACK"), resourcePath);
 
-        var templateContent = Files.readString(source.resolve(template));
-        for (var variable : TemplateVariables.getVariables(resourcePath, template)) {
-            templateContent = templateContent.replaceAll(variable.getA(), variable.getB());
+        var templateContent = Files.readString(source.resolve(template.template()));
+
+        Matcher matcher = variablePattern.matcher(template.template());
+        int index = 0;
+        while (matcher.find())
+        {
+            TemplateVariables templateVariables = TemplateVariables.getTemplateVariable(matcher.group());
+            templateContent = templateContent.replaceAll(templateVariables.varName(), template.replaces()[index]);
+            index++;
         }
         return new ByteArrayInputStream(templateContent.getBytes());
     }
@@ -118,15 +138,16 @@ public class VirtualPackResources extends AbstractPackResources {
     @Override
     public Collection<ResourceLocation> getResources(PackType type, String namespace, String pathIn, int maxDepth, Predicate<String> filter) {
         //System.out.println("getResources(" + type + " " + namespace + " " + pathIn + ")");
-        String prefix = type.getDirectory() + '/' + namespace + '/' + pathIn;
+        String prefix = type.getDirectory() + '/' + namespace + '/' + pathIn + "/";
 
-        return compiledToTemplates
+        Collection<ResourceLocation> a = compiledToTemplates
                 .keySet()
                 .stream()
                 .filter(path -> path.startsWith(prefix) && (path.split("/").length - 2) <= maxDepth) //TODO: maxDepth condition : Verify
                 .filter(filter)
                 .map(string -> new ResourceLocation(Mettle.MODID, string.replace(prefix, "")))
                 .toList();
+        return a;
     }
 
     @Nullable
@@ -149,4 +170,20 @@ public class VirtualPackResources extends AbstractPackResources {
 
     @Override
     public void close() {}
+
+    public static void backtracking(Consumer<String[]> fun, List<TemplateVariables> templateVariables, int index, LinkedList<String> replaces, IMetal metal)
+    {
+        if(index >= templateVariables.size())
+        {
+            //REPLACES IS COMPLETE ADD NEW TEMPLATE INFO
+            fun.accept(replaces.toArray(String[]::new));
+            return;
+        }
+        TemplateVariables variable = templateVariables.get(index);
+        for(String iterateEveryVariation : variable.getResult(metal)) {
+            replaces.add(iterateEveryVariation);
+            backtracking(fun, templateVariables, index + 1, replaces, metal);
+            replaces.removeLast();
+        }
+    }
 }
