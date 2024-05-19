@@ -19,9 +19,15 @@ public enum TemplateVariable {
             replacements.add(IReplacement.split(variant.toString(), variant.getTextureLocation().toString()));
         }
         return replacements;
-    })
-    ;
-
+    }),
+    SHOVEL_TOOL("shovel_ore", (iMetal) -> {
+        Set<IReplacement> replacements = Sets.newHashSet();
+        for (OreVariant variant : iMetal.oreVariants()) {
+            if(variant.getTool().equals("shovel"))
+                replacements.add(IReplacement.split(variant.toString(), variant.getTextureLocation().toString()));
+        }
+        return replacements;
+    });
     public static final Pattern PATTERN = Pattern.compile("§.*?§");
 
     private final String varName;

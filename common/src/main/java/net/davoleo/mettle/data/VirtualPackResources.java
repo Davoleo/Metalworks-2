@@ -1,12 +1,14 @@
 package net.davoleo.mettle.data;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import net.davoleo.mettle.Mettle;
 import net.davoleo.mettle.api.metal.ComponentType;
 import net.davoleo.mettle.api.metal.IMetal;
+import net.davoleo.mettle.data.template.*;
 import net.davoleo.mettle.init.ModRegistry;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +37,10 @@ public class VirtualPackResources extends AbstractPackResources {
     private Path source;
 
     private final Map<String, ComponentType> resourceConditions;
-    private final Map<String, TemplateInfo> compiledToTemplates;
+    private final Map<String, ITemplateInfo> compiledToTemplates;
+
+
+    private final List<ITemplateProvider> providers = Lists.newArrayList(new FileTemplateProvider());
 
     public VirtualPackResources() {
         super(new File("AWOWA"));
@@ -49,7 +54,6 @@ public class VirtualPackResources extends AbstractPackResources {
         try (var files = Files.walk(source);
              JsonReader conditionsReader = new JsonReader(new InputStreamReader(getRootResource("conditions.json")))
         ) {
-
             Type type = new TypeToken<Map<String, ComponentType>>(){}.getType();
             resourceConditions = new Gson().fromJson(conditionsReader, type);
 
@@ -59,63 +63,20 @@ public class VirtualPackResources extends AbstractPackResources {
                     .map(path -> Joiner.on("/").join(path))
                     .flatMap(this::generateReplacedResources)
                     .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-
-            System.out.println(compiledToTemplates);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        CodeTagTemplateProvider.tagTemplates(compiledToTemplates);
         System.out.println("VIRTUAL PACK source:" +  source);
 
     }
-
-    private Stream<Pair<String, TemplateInfo>> generateReplacedResources(String templatePath) {
-        Stream.Builder<Pair<String, TemplateInfo>> resources = Stream.builder();
-        ModRegistry.METALS.forEach((name, metal) -> {
-
-            var component = resourceConditions.get(templatePath);
-            if (component != null && !metal.value().components().get(component)) {
-                return;
-            }
-
-            Matcher matcher = TemplateVariable.PATTERN.matcher(templatePath);
-            List<TemplateVariable> variables = new ArrayList<>();
-            while(matcher.find())
-                variables.add(Objects.requireNonNull(TemplateVariable.getTemplateVariable(matcher.group())));
-
-
-            if(!variables.isEmpty()) {
-                combineTemplateVarReplacements(variables, 0, new LinkedList<>(), replacements -> {
-                    String instancedFile = templatePath.replace(".template", "");
-                    int i = 0;
-                    for (IReplacement replacement : replacements) {
-                        instancedFile = instancedFile.replace(variables.get(i++).var(), replacement.pathName());
-                    }
-
-                    resources.add(Pair.of(instancedFile, new TemplateInfo(templatePath, replacements)));
-                }, metal.value());
-            }
-        });
+    private <T extends ITemplateInfo> Stream<Pair<String, ITemplateInfo>> generateReplacedResources(String templatePath) {
+        Stream.Builder<Pair<String, ITemplateInfo>> resources = Stream.builder();
+        providers.forEach(provider -> provider.getTemplates(source, resourceConditions.get(templatePath),templatePath, resources));
         return resources.build();
     }
 
-    private void combineTemplateVarReplacements(List<TemplateVariable> templateVariables, int index, LinkedList<IReplacement> replacements, Consumer<IReplacement[]> callback, IMetal metal)
-    {
-        //already backtracked through all template variables
-        if(index >= templateVariables.size())
-        {
-            //Replacement combination is complete callback to output
-            callback.accept(replacements.toArray(IReplacement[]::new));
-            return;
-        }
-        TemplateVariable variable = templateVariables.get(index);
-        for(var iterateEveryVariation : variable.getReplacements(metal)) {
-            replacements.add(iterateEveryVariation);
-            combineTemplateVarReplacements(templateVariables, index + 1, replacements, callback, metal);
-            replacements.removeLast();
-        }
-    }
 
     @NotNull
     @Override
@@ -129,23 +90,11 @@ public class VirtualPackResources extends AbstractPackResources {
     @Override
     protected InputStream getResource(String resourcePath) throws IOException {
 
-        TemplateInfo template = compiledToTemplates.get(resourcePath);
+        ITemplateInfo template = compiledToTemplates.get(resourcePath);
 
         if (template == null)
             throw new ResourcePackFileNotFoundException(new File("METTLE_VIRTUAL_PACK"), resourcePath);
-
-        var templateContent = Files.readString(source.resolve(template.template()));
-
-        Matcher matcher = TemplateVariable.PATTERN.matcher(template.template());
-        int index = 0;
-        while (matcher.find())
-        {
-            TemplateVariable templateVariables = TemplateVariable.getTemplateVariable(matcher.group());
-            templateContent = templateContent.replaceAll(templateVariables.var(), template.replacements()[index].name());
-            templateContent = templateContent.replaceAll("§path_" + templateVariables.varName() + '§', template.replacements()[index].pathName());
-            index++;
-        }
-        return new ByteArrayInputStream(templateContent.getBytes());
+        return template.getResource(source);
     }
 
     @Override
@@ -179,7 +128,7 @@ public class VirtualPackResources extends AbstractPackResources {
 
     @Override
     public Set<String> getNamespaces(PackType type) {
-        return Set.of("mettle");
+        return Set.of("mettle","minecraft");
     }
 
     @Override

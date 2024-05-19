@@ -29,7 +29,7 @@ public class MetalBuilder {
 
     private final MetalComponents components = new MetalComponents();
 
-    private Set<OreVariant> oreVariants = Sets.immutableEnumSet(OreVariant.STONE);
+    private Set<OreVariant> oreVariants = Sets.newHashSet(OreVariant.STONE);
 
     public MetalBuilder(String name) {
         this.name = name;
@@ -90,7 +90,7 @@ public class MetalBuilder {
     }
 
     public MetalBuilder oreVariants(OreVariant... variants) {
-        oreVariants = Sets.immutableEnumSet(variants[0], variants);
+        oreVariants = Sets.newHashSet(variants);
         return this;
     }
 
