@@ -9,7 +9,6 @@ import net.davoleo.mettle.api.metal.ComponentType;
 import net.davoleo.mettle.api.metal.IMetal;
 import net.davoleo.mettle.api.metal.SimpleMetal;
 import net.davoleo.mettle.api.registry.Registry;
-import net.minecraft.resources.ResourceLocation;
 
 @MettlePack(modid = Mettle.MODID)
 public class CoreMetals implements IMettleIntegration {
@@ -29,7 +28,7 @@ public class CoreMetals implements IMettleIntegration {
                     .knockbackResistance(2)
                     .damageReduction(1,1,1,1)
             )
-            .oreVariants(OreVariant.DEEPSLATE,OreVariant.NETHERRAK,OreVariant.END_STONE, new OreVariant("aboba", new ResourceLocation("block/dirt"), "shovel"))
+            .oreVariants(OreVariant.STONE, OreVariant.DEEPSLATE)
             .component(ComponentType.ORE)
             .build();
 

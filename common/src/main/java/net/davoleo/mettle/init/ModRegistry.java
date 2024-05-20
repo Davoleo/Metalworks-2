@@ -39,6 +39,6 @@ public class ModRegistry {
     }
 
     protected static <T> RegistryEntry<T> rentry(String name, Supplier<T> supplier) {
-        return new RegistryEntry<>(name, supplier);
+        return RegistryEntry.of(name, supplier);
     }
 }

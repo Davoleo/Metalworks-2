@@ -1,27 +1,30 @@
 package net.davoleo.mettle.api.block;
 
+import net.davoleo.mettle.api.tool.ToolType;
 import net.minecraft.resources.ResourceLocation;
 
 public class OreVariant {
-    public static OreVariant STONE = new OreVariant("stone",new ResourceLocation("minecraft", "block/stone"));
-    public static OreVariant DEEPSLATE = new OreVariant("deepslate",new ResourceLocation("minecraft", "block/deepslate"));
-    public static OreVariant NETHERRAK = new OreVariant("netherrack",new ResourceLocation("minecraft", "block/netherrack"));
-    public static OreVariant END_STONE = new OreVariant("end_stone",new ResourceLocation("minecraft", "block/end_stone"));
+    public static final OreVariant STONE = new OreVariant("stone");
+    public static final OreVariant DEEPSLATE = new OreVariant("deepslate");
+    public static final OreVariant NETHERRACK = new OreVariant("netherrack");
+    public static final OreVariant END_STONE = new OreVariant("end_stone");
 
     private final String name;
     private final ResourceLocation textureLocation;
+    private final ToolType miningTool;
 
-    private String tool = "pickaxe";
-
-    public OreVariant(String name, ResourceLocation texture) {
+    public OreVariant(String name, ResourceLocation textureLocation, ToolType tool) {
         this.name = name;
-        this.textureLocation = texture;
+        this.textureLocation = textureLocation;
+        this.miningTool = tool;
     }
 
-    public OreVariant(String name, ResourceLocation texture, String tool) {
-        this.name = name;
-        this.textureLocation = texture;
-        this.tool = tool;
+    public OreVariant(String name, ToolType tool) {
+        this(name, new ResourceLocation("minecraft", "block/" + name), tool);
+    }
+
+    public OreVariant(String name) {
+        this(name, ToolType.PICKAXE);
     }
 
     @Override
@@ -29,8 +32,8 @@ public class OreVariant {
         return this.name.toLowerCase();
     }
 
-    public String getTool() {
-        return tool;
+    public ToolType getTool() {
+        return miningTool;
     }
 
     public ResourceLocation getTextureLocation() {

@@ -1,15 +1,13 @@
 package net.davoleo.mettle.data;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import net.davoleo.mettle.Mettle;
 import net.davoleo.mettle.api.metal.ComponentType;
-import net.davoleo.mettle.api.metal.IMetal;
-import net.davoleo.mettle.data.template.*;
-import net.davoleo.mettle.init.ModRegistry;
+import net.davoleo.mettle.data.template.ITemplateResource;
+import net.davoleo.mettle.data.template.VirtualResourceProviders;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.AbstractPackResources;
@@ -24,10 +22,10 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,10 +35,7 @@ public class VirtualPackResources extends AbstractPackResources {
     private Path source;
 
     private final Map<String, ComponentType> resourceConditions;
-    private final Map<String, ITemplateInfo> compiledToTemplates;
-
-
-    private final List<ITemplateProvider> providers = Lists.newArrayList(new FileTemplateProvider());
+    private final Map<String, ITemplateResource> compiledToTemplates;
 
     public VirtualPackResources() {
         super(new File("AWOWA"));
@@ -61,20 +56,18 @@ public class VirtualPackResources extends AbstractPackResources {
                     .map(source::relativize)
                     .filter(path -> path.toString().endsWith(".template.json"))
                     .map(path -> Joiner.on("/").join(path))
-                    .flatMap(this::generateReplacedResources)
+                    .flatMap(templatePath -> {
+                        Stream.Builder<Pair<String, ITemplateResource>> stream = Stream.builder();
+                        VirtualResourceProviders.generateTemplateResources(stream, templatePath, resourceConditions.get(templatePath));
+                        return stream.build();
+                    })
                     .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-        CodeTagTemplateProvider.tagTemplates(compiledToTemplates);
-        System.out.println("VIRTUAL PACK source:" +  source);
 
-    }
-    private <T extends ITemplateInfo> Stream<Pair<String, ITemplateInfo>> generateReplacedResources(String templatePath) {
-        Stream.Builder<Pair<String, ITemplateInfo>> resources = Stream.builder();
-        providers.forEach(provider -> provider.getTemplates(source, resourceConditions.get(templatePath),templatePath, resources));
-        return resources.build();
+        VirtualResourceProviders.tagMembers(compiledToTemplates);
     }
 
 
@@ -90,7 +83,7 @@ public class VirtualPackResources extends AbstractPackResources {
     @Override
     protected InputStream getResource(String resourcePath) throws IOException {
 
-        ITemplateInfo template = compiledToTemplates.get(resourcePath);
+        ITemplateResource template = compiledToTemplates.get(resourcePath);
 
         if (template == null)
             throw new ResourcePackFileNotFoundException(new File("METTLE_VIRTUAL_PACK"), resourcePath);
