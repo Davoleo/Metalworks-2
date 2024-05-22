@@ -1,11 +1,13 @@
 package net.davoleo.mettle.api.metal;
 
+import net.davoleo.mettle.api.registry.Registry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Objects;
 
-public class Alloy {
+public class Alloy implements Registry.Nameable {
 
     public record Ingredient(IMetal metal, int ratio) {
     }
@@ -42,15 +44,24 @@ public class Alloy {
         return metals;
     }
 
+    public int getIngredientCount() {
+        return metals.length;
+    }
+
     public IMetal getResult() {
         return alloy;
+    }
+
+    @Override
+    public String name() {
+        return alloy.name();
     }
 
     public static class Builder {
 
         private final IMetal output;
 
-        private Ingredient[] ingredients;
+        private final Ingredient[] ingredients;
 
         private int metalCount;
 
@@ -66,8 +77,8 @@ public class Alloy {
         public Builder addMetal(@NotNull IMetal metal, int ratio) {
             Objects.requireNonNull(metal, "metal in alloy should not be null");
 
-            if (ratio < 1 || ratio > 64) {
-                throw new IllegalArgumentException("ingredient ratio in the alloy should be between 1 and 64");
+            if (ratio < 1 || ratio > 63) {
+                throw new IllegalArgumentException("ingredient ratio in the alloy should be between 1 and 63");
             }
 
             if (metalCount >= 3)
@@ -82,7 +93,13 @@ public class Alloy {
             if (metalCount < 2)
                 throw new IllegalStateException("Can't build Alloy with less than 2 ingredient metals!");
 
-            return new Alloy(output, ingredients);
+            var fittedArray = Arrays.copyOf(ingredients, metalCount);
+            int ratioSum = Arrays.stream(fittedArray).mapToInt(Ingredient::ratio).sum();
+            if (ratioSum > 64) {
+                throw new IllegalStateException("Can't build alloy with a sum-ratio of %d".formatted(ratioSum));
+            }
+
+            return new Alloy(output, fittedArray);
         }
     }
 
