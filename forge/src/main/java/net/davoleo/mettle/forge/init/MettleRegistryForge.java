@@ -15,10 +15,6 @@ public class MettleRegistryForge implements IMettleRegistry {
     public static DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Mettle.MODID);
     public static DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Mettle.MODID);
 
-    public static void setup() {
-        Mettle.registry = new MettleRegistryForge();
-    }
-
     public static void registerOnBus(IEventBus bus) {
         BLOCKS.register(bus);
         ITEMS.register(bus);

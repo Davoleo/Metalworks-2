@@ -10,6 +10,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.Block;
 import org.slf4j.Logger;
 
+import java.util.ServiceLoader;
+
 public class Mettle {
 
     // Directly reference a slf4j logger
@@ -18,9 +20,10 @@ public class Mettle {
     public static final String MODID = "mettle";
     public static final String MODNAME = MODID;
 
-    public static IMettleRegistry registry;
-    public static IPlatformUtils platformUtils;
-    public static IBlockFluidRendering blockFluidRendering;
+    //Services
+    public static IMettleRegistry registry = ServiceLoader.load(IMettleRegistry.class).findFirst().orElseThrow();
+    public static IPlatformUtils platformUtils = ServiceLoader.load(IPlatformUtils.class).findFirst().orElseThrow();
+    public static IBlockFluidRendering blockFluidRendering = ServiceLoader.load(IBlockFluidRendering.class).findFirst().orElseThrow();
 
     public static void clientSetup() {
         ModRegistry.BLOCKS.forEach(entry -> {
