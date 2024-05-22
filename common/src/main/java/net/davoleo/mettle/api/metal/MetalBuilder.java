@@ -141,10 +141,6 @@ public class MetalBuilder {
             this.reachDistance = reachDistance;
             return this;
         }
-
-        public MetalBuilder metal() {
-            return MetalBuilder.this;
-        }
     }
 
     public class ArmorStatsBuilder {
@@ -195,10 +191,6 @@ public class MetalBuilder {
         public ArmorStatsBuilder movementSpeed(double movementSpeed) {
             this.movementSpeed = movementSpeed;
             return this;
-        }
-
-        public MetalBuilder metal() {
-            return MetalBuilder.this;
         }
     }
 
