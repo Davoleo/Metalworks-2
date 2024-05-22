@@ -1,11 +1,14 @@
 package net.davoleo.mettle.api.metal;
 
+import com.google.common.collect.Sets;
+import net.davoleo.mettle.api.block.OreVariant;
 import net.davoleo.mettle.api.metal.attribute.MetalModifier;
 import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class MetalBuilder {
 
@@ -26,6 +29,8 @@ public class MetalBuilder {
 
     private final MetalComponents components = new MetalComponents();
 
+    private Set<OreVariant> oreVariants = Sets.newHashSet(OreVariant.STONE);
+
     public MetalBuilder(String name) {
         this.name = name;
     }
@@ -33,7 +38,7 @@ public class MetalBuilder {
     public IMetal build() {
         ToolStats tool = toolStats != null ? toolStats.build() : null;
         ArmorStats armor = armorStats != null ? armorStats.build() : null;
-        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, components);
+        return new SimpleMetal(name, color, durability, enchantability, meltingTemperature, tool, armor, modifiers, components, oreVariants);
     }
 
     public MetalBuilder color(int color) {
@@ -67,14 +72,16 @@ public class MetalBuilder {
         return this;
     }
 
-    public ToolStatsBuilder toolStats() {
-        toolStats = new ToolStatsBuilder();
-        return toolStats;
+    public MetalBuilder toolStats(SmolConsumer<ToolStatsBuilder> consumer) {
+        this.toolStats = new ToolStatsBuilder();
+        consumer.accept(toolStats);
+        return this;
     }
 
-    public ArmorStatsBuilder armorStats() {
-        armorStats = new ArmorStatsBuilder();
-        return armorStats;
+    public MetalBuilder armorStats(SmolConsumer<ArmorStatsBuilder> consumer) {
+        this.armorStats = new ArmorStatsBuilder();
+        consumer.accept(armorStats);
+        return this;
     }
 
     public MetalBuilder component(ComponentType type) {
@@ -82,10 +89,14 @@ public class MetalBuilder {
         return this;
     }
 
+    public MetalBuilder oreVariants(OreVariant... variants) {
+        oreVariants = Sets.newHashSet(variants);
+        return this;
+    }
+
     public MetalBuilder components(ComponentType... types) {
         for (ComponentType type : types)
             component(type);
-
         return this;
     }
 
@@ -189,5 +200,10 @@ public class MetalBuilder {
         public MetalBuilder metal() {
             return MetalBuilder.this;
         }
+    }
+
+    @FunctionalInterface
+    public interface SmolConsumer<T> {
+        void accept(T b);
     }
 }

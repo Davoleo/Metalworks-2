@@ -1,15 +1,13 @@
 package net.davoleo.mettle.api.registry;
 
+import net.davoleo.mettle.registry.InternalRegistry;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.util.*;
 
-public class Registry<T> {
+public class Registry<T> implements Iterable<T> {
 
     public interface Nameable {
         String name();
@@ -17,7 +15,7 @@ public class Registry<T> {
 
     private final String modId;
 
-    private final Map<String, T> registryMap;
+    protected final Map<String, T> registryMap;
 
     public Registry(String modId)
     {
@@ -29,8 +27,17 @@ public class Registry<T> {
         return registryMap.values();
     }
 
-    public void forEach(BiConsumer<String, T> consumer) {
-        registryMap.forEach(consumer);
+    @ApiStatus.Internal
+    public Map<String, T> getRegistryMap(InternalRegistry.RegistryKey key) {
+        if (key == null)
+            throw new IllegalCallerException("getRegistryMap can only be called by InternalRegistry");
+        return registryMap;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<T> iterator() {
+        return getEntries().iterator();
     }
 
     public int entriesCount() {

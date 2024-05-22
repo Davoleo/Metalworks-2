@@ -1,18 +1,22 @@
 package net.davoleo.mettle.forge;
 
 import net.davoleo.mettle.Mettle;
+import net.davoleo.mettle.forge.init.ClientSetup;
 import net.davoleo.mettle.forge.init.MettlePackFinder;
 import net.davoleo.mettle.forge.init.MettleRegistryForge;
+import net.davoleo.mettle.forge.render.BlockFluidRenderingForge;
 import net.davoleo.mettle.forge.util.PlatformUtilsForge;
 import net.davoleo.mettle.init.ModRegistry;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -50,10 +54,14 @@ public class MettleForge {
         // Register the processIMC method for modloading
         modBus.addListener(this::processIMC);
 
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modBus.addListener(ClientSetup::setup));
+
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
 
         Mettle.platformUtils = new PlatformUtilsForge();
+        Mettle.blockFluidRendering = new BlockFluidRenderingForge();
+
         MettleRegistryForge.setup();
         MettlePackFinder.doTheStuff();
         ModRegistry.init();

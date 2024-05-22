@@ -1,21 +1,24 @@
 package net.davoleo.mettle.init;
 
-import com.google.common.base.Suppliers;
+import net.davoleo.mettle.api.block.OreVariant;
 import net.davoleo.mettle.api.metal.ComponentType;
 import net.davoleo.mettle.block.MettleOreBlock;
-
-import java.util.function.Supplier;
 
 public class MettleBlocks extends ModRegistry {
 
     public static void init() {
 
         //Register Ores
-        METALS.forEach((name, metal) -> {
+        METALS.forEach((metal) -> {
             if (metal.value().components().get(ComponentType.ORE)) {
-                Supplier<MettleOreBlock> oreBlock = Suppliers.memoize(() -> new MettleOreBlock(metal.value()));
-                BLOCKS.add(rentry(name + "_ore", oreBlock));
-                MettleItems.registerSimpleBlockItem(name + "_ore", oreBlock);
+                for (OreVariant oreVariant : metal.value().oreVariants()) {
+                    var regEntry = rentry(
+                            metal.value().name() + '_' + oreVariant.toString() + "_ore",
+                            () -> new MettleOreBlock(metal.value(), oreVariant)
+                    );
+                    BLOCKS.add(regEntry);
+                    MettleItems.registerSimpleBlockItem(regEntry);
+                }
             }
         });
     }
