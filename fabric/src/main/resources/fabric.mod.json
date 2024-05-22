@@ -2,21 +2,29 @@
   "schemaVersion": 1,
   "id": "mettle",
   "version": "${version}",
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "mettle",
+  "description": "mettle!",
   "authors": [
     "Davoleo",
-    "Matpac"
+    "Matpac",
+    "PierKnight"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
+    "homepage": "https://davoleo.net/",
     "sources": "https://github.com/Davoleo/mettle"
   },
   "license": "LGPL",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.examplemod.fabric.ExampleModFabric"
+      "net.davoleo.mettle.MettleFabric"
+    ],
+    "client": [
+      "net.davoleo.mettle.MettleFabricClient"
+    ],
+    "mettle_pack": [
+      "net.davoleo.mettle.init.VanillaMetals",
+      "net.davoleo.mettle.init.CoreMetals"
     ]
   },
   "mixins": [
@@ -25,7 +33,6 @@
   ],
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.18.2",
-    "architectury": ">=4.11.93"
+    "minecraft": ">=1.18.2"
   }
 }
