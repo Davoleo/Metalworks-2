@@ -1,7 +1,6 @@
 {
   "assets/mettle/blockstates/§metal§_§filler§_ore.template.json": "ore",
   "assets/mettle/models/block/§metal§_§filler§_ore.template.json": "ore",
-  "data/mettle/loot_tables/blocks/§metal§_§filler§_ore.template.json": "ore",
-  "data/minecraft/tags/blocks/mineable/shovel.tag.template.json": "ore",
-  "data/minecraft/tags/blocks/mineable/pickaxe.tag.template.json": "ore"
+  "assets/mettle/models/item/§metal§_§filler§_ore.template.json": "ore",
+  "data/mettle/loot_tables/blocks/§metal§_§filler§_ore.template.json": "ore"
 }
