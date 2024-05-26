@@ -70,17 +70,19 @@ public class VirtualResourceProviders {
 
         Multimap<String, ResourceLocation> tagMembers = Multimaps.newListMultimap(Maps.newHashMap(), Lists::newArrayList);
 
-        ModRegistry.BLOCKS.forEach(reg -> {
-            Block block = reg.entry().get();
-            if (block instanceof ITagMember) {
-                var tagMember = (ITagMember<Block>) block;
-                tagMember.getTags().forEach(tag -> {
-                    String location = "data/%s/tags/blocks/%s.json"
-                            .formatted(tag.location().getNamespace(), tag.location().getPath());
-                    tagMembers.put(location, tagMember.getResourceLocation());
-                });
+        ModRegistry.METAL_COMPONENTS.values().forEach(components -> {
+            components.forEachBlock(reg -> {
+                Block block = reg.get();
+                if (block instanceof ITagMember) {
+                    var tagMember = (ITagMember<Block>) block;
+                    tagMember.getTags().forEach(tag -> {
+                        String location = "data/%s/tags/blocks/%s.json"
+                                .formatted(tag.location().getNamespace(), tag.location().getPath());
+                        tagMembers.put(location, tagMember.getResourceLocation());
+                    });
 
-            }
+                }
+            });
         });
 
         tagMembers.asMap().forEach((path, members) -> resourceMap.put(path, new TagResource(members)));

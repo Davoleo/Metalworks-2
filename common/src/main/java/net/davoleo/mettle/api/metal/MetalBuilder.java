@@ -27,9 +27,9 @@ public class MetalBuilder {
 
     private final List<MetalModifier> modifiers = new ArrayList<>();
 
-    private final MetalComponents components = new MetalComponents();
+    private final MetalComponentFlags components = new MetalComponentFlags();
 
-    private Set<OreVariant> oreVariants = Sets.newHashSet(OreVariant.STONE);
+    private Set<OreVariant> oreVariants = Set.of(OreVariant.STONE);
 
     public MetalBuilder(String name) {
         this.name = name;
@@ -90,7 +90,7 @@ public class MetalBuilder {
     }
 
     public MetalBuilder oreVariants(OreVariant... variants) {
-        oreVariants = Sets.newHashSet(variants);
+        oreVariants = Sets.immutableEnumSet(variants[0], variants);
         return this;
     }
 

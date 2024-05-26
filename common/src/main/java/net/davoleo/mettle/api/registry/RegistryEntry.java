@@ -1,8 +1,12 @@
-package net.davoleo.mettle.registry;
+package net.davoleo.mettle.api.registry;
 
 import java.util.function.Supplier;
 
 public record RegistryEntry<T>(String name, CachingSupplier<T> entry) {
+
+    public T get() {
+        return entry.get();
+    }
 
     public static <T> RegistryEntry<T> of(String name, Supplier<T> entry) {
         return new RegistryEntry<>(name, new CachingSupplier<>(entry));

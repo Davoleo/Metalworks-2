@@ -55,7 +55,7 @@ public interface IMetal extends Registry.Nameable {
      */
     List<MetalModifier> modifiers();
 
-    MetalComponents components();
+    MetalComponentFlags components();
 
     Set<OreVariant> oreVariants();
 

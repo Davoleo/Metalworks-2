@@ -2,7 +2,6 @@ package net.davoleo.mettle.mixin;
 
 import com.google.common.collect.ImmutableSet;
 import net.davoleo.mettle.data.VirtualRepositorySource;
-import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import org.spongepowered.asm.mixin.Final;
@@ -25,9 +24,9 @@ public class VirtualPackRegistrarMixin {
             method = "<init>(Lnet/minecraft/server/packs/repository/Pack$PackConstructor;[Lnet/minecraft/server/packs/repository/RepositorySource;)V",
             at = @At("TAIL")
     )
-    private void onConstruction(Pack.PackConstructor constructor, RepositorySource[] sources, CallbackInfo ci) {
+    private void onConstruction(CallbackInfo ci) {
         this.sources = ImmutableSet.<RepositorySource>builder()
-                .add(sources)
+                .addAll(this.sources)
                 .add(VirtualRepositorySource.get())
                 .build();
     }

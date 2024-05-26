@@ -1,11 +1,12 @@
 package net.davoleo.mettle.api.registry;
 
+import com.google.common.collect.Streams;
 import net.davoleo.mettle.registry.InternalRegistry;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class Registry<T> implements Iterable<T> {
 
@@ -44,6 +45,10 @@ public class Registry<T> implements Iterable<T> {
         return registryMap.size();
     }
 
+    public Stream<T> stream() {
+        return Streams.stream(this);
+    }
+
     public T register(T value)
     {
         if (!(value instanceof Nameable v)) {
@@ -68,10 +73,11 @@ public class Registry<T> implements Iterable<T> {
         return this.registryMap.put(name, object);
     }
 
-    @Nullable
     public T get(@NotNull String name)
     {
         Objects.requireNonNull(name,"Metal Name cannot be null");
+        if (!registryMap.containsKey(name))
+            throw new NoSuchElementException("Metal " + modId + ':' + name +  " not found");
         return this.registryMap.get(name);
     }
 

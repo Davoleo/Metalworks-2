@@ -1,29 +1,52 @@
 package net.davoleo.mettle.api.metal;
 
-/**
- * If methods' implementation return null,
- * items and blocks won't be added by Mettle,
- * otherwise the mod's features will be used
- */
-public final class MetalComponents {
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import net.davoleo.mettle.api.block.OreVariant;
+import net.davoleo.mettle.api.registry.RegistryEntry;
+import net.davoleo.mettle.block.MettleOreBlock;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
-    private long flags;
+import java.util.Map;
+import java.util.function.Consumer;
 
-    public MetalComponents(long flags) {
-        this.flags = flags;
+public record MetalComponents(
+        RegistryEntry<Item> raw,
+        ImmutableMap<OreVariant, RegistryEntry<MettleOreBlock>> ores
+        ) {
+
+    public void forEachBlock(Consumer<RegistryEntry<? extends Block>> blockConsumer) {
+        this.ores.values().forEach(blockConsumer);
     }
 
-    public MetalComponents(ComponentType... flags) {
-        for (ComponentType flag : flags) {
-            this.set(flag);
+    public void forEachItem(Consumer<RegistryEntry<? extends Item>> itemConsumer) {
+        itemConsumer.accept(this.raw);
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private RegistryEntry<Item> raw;
+        private final Map<OreVariant, RegistryEntry<MettleOreBlock>> ores = Maps.newEnumMap(OreVariant.class);
+
+        private Builder() {
         }
-    }
 
-    protected void set(ComponentType type) {
-        flags |= type.getFlag();
-    }
+        public Builder setRaw(RegistryEntry<Item> raw) {
+            this.raw = raw;
+            return this;
+        }
 
-    public boolean get(ComponentType type) {
-        return (type.getFlag() & flags) != 0;
+        public Builder addOre(OreVariant variant, RegistryEntry<MettleOreBlock> ore) {
+            this.ores.put(variant, ore);
+            return this;
+        }
+
+        public MetalComponents build() {
+            return new MetalComponents(raw, Maps.immutableEnumMap(ores));
+        }
     }
 }

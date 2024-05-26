@@ -1,30 +1,37 @@
 package net.davoleo.mettle.api.block;
 
 import net.davoleo.mettle.api.tool.ToolType;
+import net.minecraft.data.worldgen.features.OreFeatures;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
-public class OreVariant {
-    public static final OreVariant STONE = new OreVariant("stone");
-    public static final OreVariant DEEPSLATE = new OreVariant("deepslate");
-    public static final OreVariant NETHERRACK = new OreVariant("netherrack");
-    public static final OreVariant END_STONE = new OreVariant("end_stone");
+public enum OreVariant {
+    STONE("stone", OreFeatures.STONE_ORE_REPLACEABLES),
+    DEEPSLATE("deepslate", OreFeatures.DEEPSLATE_ORE_REPLACEABLES),
+    NETHERRACK("netherrack", OreFeatures.NETHER_ORE_REPLACEABLES),
+    END_STONE("end_stone", new BlockMatchTest(Blocks.END_STONE)),
+    ;
 
     private final String name;
     private final ResourceLocation textureLocation;
     private final ToolType miningTool;
+    private final RuleTest replaceRule;
 
-    public OreVariant(String name, ResourceLocation textureLocation, ToolType tool) {
+    OreVariant(String name, ResourceLocation textureLocation, ToolType tool, RuleTest replaceRule) {
         this.name = name;
         this.textureLocation = textureLocation;
         this.miningTool = tool;
+        this.replaceRule = replaceRule;
     }
 
-    public OreVariant(String name, ToolType tool) {
-        this(name, new ResourceLocation("minecraft", "block/" + name), tool);
+    OreVariant(String name, ToolType tool, RuleTest replaceRule) {
+        this(name, new ResourceLocation("minecraft", "block/" + name), tool, replaceRule);
     }
 
-    public OreVariant(String name) {
-        this(name, ToolType.PICKAXE);
+    OreVariant(String name, RuleTest replaceRule) {
+        this(name, ToolType.PICKAXE, replaceRule);
     }
 
     @Override
@@ -38,5 +45,9 @@ public class OreVariant {
 
     public ResourceLocation getTextureLocation() {
         return textureLocation;
+    }
+
+    public RuleTest getTargetReplaceRuleTest() {
+        return replaceRule;
     }
 }

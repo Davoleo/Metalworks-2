@@ -15,7 +15,7 @@ public record SimpleMetal(
         ToolStats toolStats,
         ArmorStats armorStats,
         List<MetalModifier> modifiers,
-        MetalComponents components,
+        MetalComponentFlags components,
         Set<OreVariant> oreVariants
 ) implements IMetal {
 
