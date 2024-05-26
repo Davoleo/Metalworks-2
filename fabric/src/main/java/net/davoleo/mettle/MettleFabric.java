@@ -2,6 +2,7 @@ package net.davoleo.mettle;
 
 import net.davoleo.mettle.init.MettlePackFinderFabric;
 import net.davoleo.mettle.init.ModRegistry;
+import net.davoleo.mettle.world.MettleOreGeneration;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -24,5 +25,7 @@ public class MettleFabric implements ModInitializer {
     public void onInitialize() {
         Mettle.LOGGER.info("HELLO FROM {}", Mettle.MODNAME);
         ModRegistry.init();
+
+        MettleOreGeneration.generate();
     }
 }

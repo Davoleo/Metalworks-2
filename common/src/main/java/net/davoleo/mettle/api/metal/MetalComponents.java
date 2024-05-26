@@ -7,12 +7,13 @@ import net.davoleo.mettle.api.registry.RegistryEntry;
 import net.davoleo.mettle.block.MettleOreBlock;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.Consumer;
 
 public record MetalComponents(
-        RegistryEntry<Item> raw,
+        @Nullable RegistryEntry<Item> raw,
         ImmutableMap<OreVariant, RegistryEntry<MettleOreBlock>> ores
         ) {
 
@@ -21,7 +22,8 @@ public record MetalComponents(
     }
 
     public void forEachItem(Consumer<RegistryEntry<? extends Item>> itemConsumer) {
-        itemConsumer.accept(this.raw);
+        if (this.raw != null)
+            itemConsumer.accept(this.raw);
     }
 
     public static Builder builder() {

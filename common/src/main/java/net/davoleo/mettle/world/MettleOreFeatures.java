@@ -45,6 +45,14 @@ public class MettleOreFeatures {
         return FeatureUtils.register(Mettle.MODID + ':' + name, Feature.ORE, oreConfig);
     }
 
+    public static final List<Holder<ConfiguredFeature<OreConfiguration, ?>>> ALL = List.of(
+            TIN_ORE,
+            NICKEL_ORE,
+            CHROMIUM_ORE,
+            TITANIUM_ORE,
+            WOLFRAM_ORE
+    );
+
     private static List<OreConfiguration.TargetBlockState> targetBlockList(IMetal metal, MetalComponents components) {
         return metal.oreVariants().stream()
                 .map(oreVariant -> {
