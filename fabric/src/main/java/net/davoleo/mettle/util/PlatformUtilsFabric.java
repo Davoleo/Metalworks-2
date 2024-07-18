@@ -2,6 +2,7 @@ package net.davoleo.mettle.util;
 
 import net.davoleo.mettle.Mettle;
 import net.davoleo.mettle.MettleFabric;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.world.item.CreativeModeTab;
@@ -34,5 +35,10 @@ public class PlatformUtilsFabric implements IPlatformUtils {
     @Override
     public Platform getModLoader() {
         return Platform.FABRIC;
+    }
+
+    @Override
+    public Side getPhysicalSide() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? Side.CLIENT : Side.SERVER;
     }
 }

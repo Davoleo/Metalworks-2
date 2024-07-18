@@ -25,6 +25,6 @@ public class MettleItems extends ModRegistry {
         BLOCK_ITEMS.add(rentry(block.name(), () -> new BlockItem(block.entry().get(), defTab)));
     }
 
-    public static Item.Properties defTab = new Item.Properties().tab(Mettle.platformUtils.getTab());
+    public static Item.Properties defTab = new Item.Properties().tab(Mettle.PLATFORM_UTILS.getTab());
 
 }

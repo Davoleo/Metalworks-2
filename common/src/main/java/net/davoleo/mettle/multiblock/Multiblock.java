@@ -1,43 +1,67 @@
-package net.davoleo.mettle.api.multiblock;
+package net.davoleo.mettle.multiblock;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class Multiblock {
 
     private StructureTemplate template;
 
-    private Vec3i[] itemPorts;
-    private Vec3i[] fluidPorts;
-    private Vec3i[] simpleSlaves;
-
     private Multiblock(StructureTemplate template)
     {
         this.template = template;
-        //OFFUSCAMENTO
+    }
+
+    private List<StructureTemplate.StructureBlockInfo> getStructureBlocks() {
+        return getStructureBlocks(structureBlockInfo -> true);
+    }
+
+    private List<StructureTemplate.StructureBlockInfo> getStructureBlocks(Predicate<StructureTemplate.StructureBlockInfo> condition) {
+        List<StructureTemplate.StructureBlockInfo> list = new ArrayList<>();
+
+        //access widener
+        StructureTemplate.Palette palette = template.palettes.get(0);
+        for (var blockInfo : palette.blocks()) {
+            if (condition.test(blockInfo)) {
+                list.add(blockInfo);
+            }
+        }
+        return list;
     }
 
     public boolean checkStructure(Level level, BlockPos pos)
     {
-        throw new NotImplementedException();
-//        for (StructureTemplate.StructureBlockInfo block : .get(0).blocks())
-//        {
-//            if(!block.state.is(level.getBlockState(pos).getBlock()))
-//                return false;
-//        }
-//        return true;
+
+        var pivotList = getStructureBlocks(structureBlockInfo -> structureBlockInfo.state.is(level.getBlockState(pos).getBlock()));
+        if (pivotList.isEmpty()) {
+            throw new IllegalStateException("no pivot in structure, oh man...");
+        }
+
+        StructurePlaceSettings settings = new StructurePlaceSettings().setRotationPivot(pivotList.get(0).pos);
+
+        for (StructureTemplate.StructureBlockInfo structureBlockInfo : this.getStructureBlocks())
+        {
+            BlockPos worldPos = StructureTemplate.calculateRelativePosition(settings, structureBlockInfo.pos).offset(pos);
+
+            // pos is the base multiblock block (controller), we can safely assume it's the controller TE block
+            if (worldPos == pos) {
+                continue;
+            }
+
+            if(!structureBlockInfo.state.is(level.getBlockState(worldPos).getBlock()))
+                return false;
+        }
+        return true;
     }
 
     /*

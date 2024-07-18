@@ -19,14 +19,14 @@ public class Mettle {
     public static final String MODNAME = MODID;
 
     //Services
-    public static IMettleRegistry registry = ServiceLoader.load(IMettleRegistry.class).findFirst().orElseThrow();
-    public static IPlatformUtils platformUtils = ServiceLoader.load(IPlatformUtils.class).findFirst().orElseThrow();
-    public static IBlockFluidRendering blockFluidRendering = ServiceLoader.load(IBlockFluidRendering.class).findFirst().orElseThrow();
+    public final static IMettleRegistry REGISTRY = ServiceLoader.load(IMettleRegistry.class).findFirst().orElseThrow();
+    public final static IPlatformUtils PLATFORM_UTILS = ServiceLoader.load(IPlatformUtils.class).findFirst().orElseThrow();
+    public final static IBlockFluidRendering BLOCK_FLUID_RENDERING = ServiceLoader.load(IBlockFluidRendering.class).findFirst().orElseThrow();
 
     public static void clientSetup() {
         ModRegistry.METAL_COMPONENTS.values().forEach(
                 components -> components.ores().values().forEach(
-                        ore -> blockFluidRendering.setRenderType(ore.get(), RenderType.cutout())
+                        ore -> BLOCK_FLUID_RENDERING.setRenderType(ore.get(), RenderType.cutout())
                 )
         );
     }

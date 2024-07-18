@@ -5,7 +5,9 @@ import net.davoleo.mettle.forge.MettleForge;
 import net.davoleo.mettle.util.IPlatformUtils;
 import net.davoleo.mettle.util.Platform;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
 
 import java.nio.file.Path;
@@ -30,6 +32,11 @@ public class PlatformUtilsForge implements IPlatformUtils {
     @Override
     public Platform getModLoader() {
         return Platform.FORGE;
+    }
+
+    @Override
+    public Side getPhysicalSide() {
+        return FMLEnvironment.dist == Dist.CLIENT ? Side.CLIENT : Side.SERVER;
     }
 
 }

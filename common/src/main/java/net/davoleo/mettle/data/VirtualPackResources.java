@@ -39,9 +39,9 @@ public class VirtualPackResources extends AbstractPackResources {
 
     public VirtualPackResources() {
         super(new File("AWOWA"));
-        this.source = Mettle.platformUtils.getResourcesPath().resolve("virtual");
-        if (Mettle.platformUtils.isDevEnv()) {
-            String newPath = source.toString().replace(Mettle.platformUtils.getModLoader().toString(), "common");
+        this.source = Mettle.PLATFORM_UTILS.getResourcesPath().resolve("virtual");
+        if (Mettle.PLATFORM_UTILS.isDevEnv()) {
+            String newPath = source.toString().replace(Mettle.PLATFORM_UTILS.getModLoader().toString(), "common");
             this.source = Path.of(newPath);
         }
 

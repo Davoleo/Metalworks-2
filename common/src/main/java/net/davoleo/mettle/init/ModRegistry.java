@@ -39,11 +39,13 @@ public class ModRegistry {
                 .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, builderEntry -> builderEntry.getValue().build()));
 
         for (MetalComponents metalComponents : METAL_COMPONENTS.values()) {
-            metalComponents.forEachBlock(regEntry -> Mettle.registry.registerBlock(regEntry.name(), regEntry.entry()));
-            metalComponents.forEachItem(regEntry -> Mettle.registry.registerItem(regEntry.name(), regEntry.entry()));
+            metalComponents.forEachBlock(regEntry -> Mettle.REGISTRY.registerBlock(regEntry.name(), regEntry.entry()));
+            metalComponents.forEachItem(regEntry -> Mettle.REGISTRY.registerItem(regEntry.name(), regEntry.entry()));
         }
 
-        BLOCK_ITEMS.forEach(regObj -> Mettle.registry.registerItem(regObj.name(), regObj.entry()));
+        BLOCK_ITEMS.forEach(regObj -> Mettle.REGISTRY.registerItem(regObj.name(), regObj.entry()));
+
+        MettleBEs.init();
     }
 
     public static void registerPack(String modid, IMettleIntegration pack) {
